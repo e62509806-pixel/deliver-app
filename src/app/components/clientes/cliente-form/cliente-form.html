@@ -3,19 +3,143 @@
     <div class="col-md-10 col-lg-8">
       <div class="card">
         <div class="card-header">
-          <h4 class="mb-0">
-            {{ isEdit ? "Editar Cliente" : "Nuevo Cliente" }}
-          </h4>
-          @if (viaje) {
-          <small class="text-muted">
-            Viaje #{{ viaje.id }} - {{ viaje.date | date : "dd/MM/yyyy" }}
-          </small>
-          }
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0">
+                {{ isEdit ? "Editar Cliente" : "Nuevo Cliente" }}
+              </h4>
+              @if (viaje) {
+              <small class="text-muted">
+                Viaje #{{ viaje.id }} - {{ viaje.date | date : "dd/MM/yyyy" }}
+              </small>
+              }
+            </div>
+            @if (!isEdit) {
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm"
+              (click)="toggleClientSearch()"
+              [disabled]="loading"
+            >
+              <i class="fas fa-search"></i> Buscar Cliente
+            </button>
+            }
+          </div>
         </div>
         <div class="card-body">
           @if (error) {
           <div class="alert alert-danger" role="alert">
             {{ error }}
+          </div>
+          }
+
+          <!-- Modal de búsqueda de clientes -->
+          @if (showClientSearch) {
+          <div class="modal-backdrop show" (click)="toggleClientSearch()"></div>
+          <div class="modal show d-block" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    <i class="fas fa-search"></i> Buscar Cliente Existente
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    (click)="toggleClientSearch()"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3">
+                    <label for="searchTerm" class="form-label"
+                      >Buscar por nombre:</label
+                    >
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="searchTerm"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchClients()"
+                        placeholder="Escribe al menos 2 caracteres..."
+                        [disabled]="searching"
+                      />
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        (click)="clearSearch()"
+                        [disabled]="searching"
+                      >
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  @if (searching) {
+                  <div class="text-center">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Buscando...</span>
+                    </div>
+                    <span class="ms-2">Buscando clientes...</span>
+                  </div>
+                  } @else if (searchResults.length > 0) {
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Apellido</th>
+                          <th>Cédula</th>
+                          <th>Teléfono</th>
+                          <th>Destino</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (cliente of searchResults; track cliente.id) {
+                        <tr>
+                          <td>{{ cliente.name }}</td>
+                          <td>{{ cliente.family_name || "-" }}</td>
+                          <td>{{ cliente.identity_card || "-" }}</td>
+                          <td>{{ cliente.phone || "-" }}</td>
+                          <td>{{ cliente.destination }}</td>
+                          <td>
+                            <button
+                              class="btn btn-primary btn-sm"
+                              (click)="selectClient(cliente)"
+                            >
+                              <i class="fas fa-check"></i> Seleccionar
+                            </button>
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                  } @else if (searchTerm.length >= 2) {
+                  <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    No se encontraron clientes con ese nombre.
+                  </div>
+                  } @else {
+                  <div class="alert alert-secondary" role="alert">
+                    <i class="fas fa-search"></i>
+                    Escribe al menos 2 caracteres para buscar clientes.
+                  </div>
+                  }
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="toggleClientSearch()"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           }
 

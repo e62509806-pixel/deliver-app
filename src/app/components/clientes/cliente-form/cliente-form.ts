@@ -38,6 +38,12 @@ export class ClienteForm implements OnInit {
   loading = false;
   error: string | null = null;
 
+  // Propiedades para búsqueda de clientes
+  showClientSearch = false;
+  searchTerm = '';
+  searchResults: Cliente[] = [];
+  searching = false;
+
   constructor(
     private clientesService: ClientesService,
     private viajesService: ViajesService,
@@ -161,5 +167,59 @@ export class ClienteForm implements OnInit {
 
   cancel() {
     this.router.navigate(['/clientes', this.viajeId]);
+  }
+
+  // Métodos para búsqueda de clientes
+  toggleClientSearch() {
+    this.showClientSearch = !this.showClientSearch;
+    if (this.showClientSearch) {
+      this.searchTerm = '';
+      this.searchResults = [];
+    }
+  }
+
+  async searchClients() {
+    if (this.searchTerm.trim().length < 2) {
+      this.searchResults = [];
+      return;
+    }
+
+    this.searching = true;
+    try {
+      this.searchResults = await this.clientesService.searchClientesByName(
+        this.searchTerm.trim()
+      );
+    } catch (error) {
+      this.error = 'Error al buscar clientes';
+      console.error('Error searching clients:', error);
+    } finally {
+      this.searching = false;
+    }
+  }
+
+  selectClient(cliente: Cliente) {
+    // Precargar los datos del cliente seleccionado
+    this.cliente = {
+      number: cliente.number,
+      name: cliente.name,
+      identity_card: cliente.identity_card,
+      destination: cliente.destination,
+      packages: cliente.packages,
+      family_name: cliente.family_name || '',
+      phone: cliente.phone,
+      description: cliente.description || '',
+      delivered: cliente.delivered,
+      viaje_id: this.viajeId || 0,
+    };
+
+    // Cerrar el modal de búsqueda
+    this.showClientSearch = false;
+    this.searchTerm = '';
+    this.searchResults = [];
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.searchResults = [];
   }
 }

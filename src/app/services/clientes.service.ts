@@ -98,4 +98,18 @@ export class ClientesService {
     }
     return data;
   }
+
+  async searchClientesByName(searchTerm: string): Promise<Cliente[]> {
+    const { data, error } = await this.supabase.client
+      .from('clientes')
+      .select('*')
+      .ilike('name', `%${searchTerm}%`)
+      .order('name', { ascending: true })
+      .limit(20);
+
+    if (error) {
+      throw error;
+    }
+    return data || [];
+  }
 }
