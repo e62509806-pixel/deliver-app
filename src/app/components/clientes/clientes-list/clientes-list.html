@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container mt-4" (click)="closeMenus()">
   <div class="row">
     <div class="col-12">
       <!-- Header con información del viaje -->
@@ -22,37 +22,6 @@
           </button>
         </div>
       </div>
-
-      <!-- Botones de acción para PDF e impresión -->
-      @if (clientes.length > 0) {
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="d-flex justify-content-end gap-2">
-            <button
-              class="btn btn-success"
-              (click)="generatePDF()"
-              [disabled]="selectedClientes.size === 0"
-              title="Generar PDF de clientes seleccionados"
-            >
-              <i class="fas fa-file-pdf"></i> Generar PDF
-            </button>
-            <button
-              class="btn btn-info"
-              (click)="printPDF()"
-              [disabled]="selectedClientes.size === 0"
-              title="Imprimir clientes seleccionados"
-            >
-              <i class="fas fa-print"></i> Imprimir
-            </button>
-          </div>
-          @if (selectedClientes.size > 0) {
-          <div class="text-muted small mt-2 text-end">
-            {{ selectedClientes.size }} cliente(s) seleccionado(s)
-          </div>
-          }
-        </div>
-      </div>
-      }
 
       <!-- Estadísticas -->
       @if (clientes.length > 0) {
@@ -134,6 +103,86 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      }
+
+      <!-- Menús desplegables para PDF e impresión -->
+      @if (clientes.length > 0) {
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-end gap-2">
+            <!-- Menú Listado -->
+            <div
+              class="dropdown"
+              [class.show]="showListadoMenu"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                class="btn btn-success dropdown-toggle"
+                type="button"
+                (click)="toggleListadoMenu()"
+                [disabled]="selectedClientes.size === 0"
+                title="Opciones de listado"
+              >
+                <i class="fas fa-list"></i> Listado
+              </button>
+              <div class="dropdown-menu" [class.show]="showListadoMenu">
+                <button
+                  class="dropdown-item"
+                  (click)="generatePDF(); closeMenus()"
+                  [disabled]="selectedClientes.size === 0"
+                >
+                  <i class="fas fa-file-pdf"></i> Generar PDF
+                </button>
+                <button
+                  class="dropdown-item"
+                  (click)="printPDF(); closeMenus()"
+                  [disabled]="selectedClientes.size === 0"
+                >
+                  <i class="fas fa-print"></i> Imprimir
+                </button>
+              </div>
+            </div>
+
+            <!-- Menú Etiquetas -->
+            <div
+              class="dropdown"
+              [class.show]="showEtiquetasMenu"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                class="btn btn-info dropdown-toggle"
+                type="button"
+                (click)="toggleEtiquetasMenu()"
+                [disabled]="selectedClientes.size === 0"
+                title="Opciones de etiquetas"
+              >
+                <i class="fas fa-tags"></i> Etiquetas
+              </button>
+              <div class="dropdown-menu" [class.show]="showEtiquetasMenu">
+                <button
+                  class="dropdown-item"
+                  (click)="generateEtiquetasPDF(); closeMenus()"
+                  [disabled]="selectedClientes.size === 0"
+                >
+                  <i class="fas fa-file-pdf"></i> Generar PDF
+                </button>
+                <button
+                  class="dropdown-item"
+                  (click)="printEtiquetasPDF(); closeMenus()"
+                  [disabled]="selectedClientes.size === 0"
+                >
+                  <i class="fas fa-print"></i> Imprimir
+                </button>
+              </div>
+            </div>
+          </div>
+          @if (selectedClientes.size > 0) {
+          <div class="text-muted small mt-2 text-end">
+            {{ selectedClientes.size }} cliente(s) seleccionado(s)
+          </div>
+          }
         </div>
       </div>
       } @if (error) {

@@ -26,6 +26,10 @@ export class ClientesList implements OnInit {
   selectedClientes: Set<number> = new Set();
   selectAll = false;
 
+  // Menús desplegables
+  showListadoMenu = false;
+  showEtiquetasMenu = false;
+
   constructor(
     private clientesService: ClientesService,
     private viajesService: ViajesService,
@@ -232,6 +236,177 @@ export class ClientesList implements OnInit {
 
   printPDF() {
     const doc = this.generatePDF(true) as jsPDF;
+    if (!doc) return;
+
+    doc.autoPrint();
+
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const printWindow = window.open(pdfUrl);
+    if (printWindow) {
+      printWindow.addEventListener('load', () => {
+        printWindow.focus();
+        printWindow.print();
+      });
+    }
+  }
+
+  // ✅ Menús desplegables
+  toggleListadoMenu() {
+    this.showListadoMenu = !this.showListadoMenu;
+    this.showEtiquetasMenu = false;
+  }
+
+  toggleEtiquetasMenu() {
+    this.showEtiquetasMenu = !this.showEtiquetasMenu;
+    this.showListadoMenu = false;
+  }
+
+  closeMenus() {
+    this.showListadoMenu = false;
+    this.showEtiquetasMenu = false;
+  }
+
+  // ✅ Generación de etiquetas
+  generateEtiquetasPDF(returnDoc = false): jsPDF | void {
+    const selectedClientes = this.getSelectedClientes();
+    if (selectedClientes.length === 0) {
+      alert('Por favor selecciona al menos un cliente');
+      return;
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 5;
+    const labelWidth = (pageWidth - margin * 2) / 2; // 2 etiquetas por fila, sin espacio entre ellas
+    const labelHeight = 85; // Aumentado para el logo
+    const labelSpacing = 0; // Sin espacio entre etiquetas
+
+    let currentX = margin;
+    let currentY = margin;
+    let labelCount = 0;
+
+    selectedClientes.forEach((cliente) => {
+      // Verificar si necesitamos una nueva página
+      if (currentY + labelHeight > pageHeight - margin) {
+        doc.addPage();
+        currentX = margin;
+        currentY = margin;
+      }
+
+      // Dibujar borde de la etiqueta
+      doc.rect(currentX, currentY, labelWidth, labelHeight);
+
+      // Logo en la parte superior
+      try {
+        const logoWidth = 18; // Logo más grande
+        const logoHeight = 18; // Logo más grande
+        const logoX = currentX + (labelWidth - logoWidth) / 2; // Centrado
+        const logoY = currentY + 2;
+
+        // Agregar el logo (si existe)
+        doc.addImage('/logo.png', 'PNG', logoX, logoY, logoWidth, logoHeight);
+      } catch (error) {
+        // Si no se puede cargar el logo, continuar sin él
+        console.log('Logo no encontrado, continuando sin logo');
+      }
+
+      // Contenido de la etiqueta (empezar después del logo)
+      let yPos = currentY + 24; // Más espacio para el logo más grande
+      const lineHeight = 14; // Líneas un poco más separadas
+
+      // Información en línea
+      doc.setFontSize(14).setFont('helvetica', 'bold'); // Fuente más grande
+
+      // Función para agregar texto con salto de línea automático
+      const addTextWithWrap = (
+        text: string,
+        x: number,
+        y: number,
+        maxWidth: number
+      ) => {
+        const lines = doc.splitTextToSize(text, maxWidth);
+        lines.forEach((line: string, index: number) => {
+          doc.text(line, x, y + index * 4);
+        });
+        return lines.length * 4; // Retorna la altura usada
+      };
+
+      const textMargin = 2;
+      const maxTextWidth = labelWidth - textMargin * 2;
+
+      // Destinatario
+      const destinatario = cliente.family_name || cliente.name;
+      const destinatarioText = `Destinatario: ${destinatario}`;
+      const destinatarioHeight = addTextWithWrap(
+        destinatarioText,
+        currentX + textMargin,
+        yPos,
+        maxTextWidth
+      );
+      yPos += destinatarioHeight + 6;
+
+      // Teléfono
+      const telefono = cliente.phone ? `+53 ${cliente.phone}` : 'No disponible';
+      const telefonoText = `Teléfono: ${telefono}`;
+      const telefonoHeight = addTextWithWrap(
+        telefonoText,
+        currentX + textMargin,
+        yPos,
+        maxTextWidth
+      );
+      yPos += telefonoHeight + 6;
+
+      // CI
+      const ci = cliente.identity_card
+        ? cliente.identity_card.toString()
+        : 'No disponible';
+      const ciText = `CI: ${ci}`;
+      const ciHeight = addTextWithWrap(
+        ciText,
+        currentX + textMargin,
+        yPos,
+        maxTextWidth
+      );
+      yPos += ciHeight + 6;
+
+      // Municipio
+      const municipioText = `Municipio: ${cliente.destination}`;
+      const municipioHeight = addTextWithWrap(
+        municipioText,
+        currentX + textMargin,
+        yPos,
+        maxTextWidth
+      );
+      yPos += municipioHeight + 6;
+
+      // Enviado por
+      const enviadoText = `Enviado por: ${cliente.name}`;
+      addTextWithWrap(enviadoText, currentX + textMargin, yPos, maxTextWidth);
+
+      // Mover a la siguiente etiqueta
+      labelCount++;
+      if (labelCount % 2 === 0) {
+        // Nueva fila
+        currentX = margin;
+        currentY += labelHeight + labelSpacing;
+      } else {
+        // Misma fila, siguiente columna
+        currentX += labelWidth;
+      }
+    });
+
+    if (returnDoc) return doc;
+
+    const fileName = `etiquetas_viaje_${this.viaje?.id || 'sin_viaje'}_${
+      new Date().toISOString().split('T')[0]
+    }.pdf`;
+    doc.save(fileName);
+  }
+
+  printEtiquetasPDF() {
+    const doc = this.generateEtiquetasPDF(true) as jsPDF;
     if (!doc) return;
 
     doc.autoPrint();
