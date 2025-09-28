@@ -1,0 +1,76 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Gestión de Viajes</h2>
+        <button class="btn btn-primary" (click)="addViaje()">
+          <i class="fas fa-plus"></i> Nuevo Viaje
+        </button>
+      </div>
+
+      @if (error) {
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+      } @if (loading) {
+      <div class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+      } @else if (viajes.length === 0) {
+      <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">No hay viajes registrados</h4>
+        <p>Comienza creando tu primer viaje.</p>
+        <hr />
+        <button class="btn btn-primary" (click)="addViaje()">
+          Crear Primer Viaje
+        </button>
+      </div>
+      } @else {
+      <div class="row">
+        @for (viaje of viajes; track viaje.id) {
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Viaje #{{ viaje.id }}</h5>
+              <p class="card-text">
+                <strong>Fecha:</strong> {{ formatDate(viaje.date) }}<br />
+                @if (viaje.description) {
+                <strong>Descripción:</strong> {{ viaje.description }}
+                }
+              </p>
+            </div>
+            <div class="card-footer">
+              <div class="btn-group w-100" role="group">
+                <button
+                  class="btn btn-outline-primary btn-sm"
+                  (click)="viewClientes(viaje.id!)"
+                  title="Ver Clientes"
+                >
+                  <i class="fas fa-users"></i> Clientes
+                </button>
+                <button
+                  class="btn btn-outline-secondary btn-sm"
+                  (click)="editViaje(viaje.id!)"
+                  title="Editar Viaje"
+                >
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="deleteViaje(viaje.id!)"
+                  title="Eliminar Viaje"
+                >
+                  <i class="fas fa-trash"></i> Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

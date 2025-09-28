@@ -1,59 +1,185 @@
-# DeliverApp
+# Deliver App - Gestión de Viajes y Clientes
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+Una aplicación web desarrollada con Angular 20, Bootstrap 5 y Supabase para gestionar viajes y clientes de manera eficiente.
 
-## Development server
+## 🚀 Características
 
-To start a local development server, run:
+- **Gestión de Viajes**: Crear, editar, eliminar y visualizar viajes
+- **Gestión de Clientes**: Agregar clientes a cada viaje con información detallada
+- **Estado de Entrega**: Marcar paquetes como entregados o pendientes
+- **Estadísticas**: Dashboard con métricas de clientes y paquetes
+- **Interfaz Responsiva**: Diseño moderno con Bootstrap 5
+- **Base de Datos**: Integración completa con Supabase
 
-```bash
-ng serve
+## 🛠️ Tecnologías Utilizadas
+
+- **Frontend**: Angular 20.1.0
+- **UI Framework**: Bootstrap 5.3.3
+- **Iconos**: Font Awesome 6.4.0
+- **Backend**: Supabase
+- **Base de Datos**: PostgreSQL (Supabase)
+- **TypeScript**: 5.8.2
+
+## 📋 Estructura de la Base de Datos
+
+### Tabla `viajes`
+
+```sql
+CREATE TABLE viajes (
+  id BIGSERIAL PRIMARY KEY,
+  date DATE NOT NULL,
+  description TEXT
+);
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Tabla `clientes`
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sql
+CREATE TABLE clientes (
+  id BIGSERIAL PRIMARY KEY,
+  number INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  identity_card INTEGER, -- opcional
+  destination TEXT NOT NULL,
+  packages INTEGER NOT NULL,
+  family_name TEXT, -- opcional
+  phone TEXT, -- opcional
+  familiar TEXT, -- opcional
+  description TEXT, -- opcional
+  delivered BOOLEAN DEFAULT FALSE,
+  viaje_id BIGINT NOT NULL,
+  CONSTRAINT fk_viaje FOREIGN KEY (viaje_id) REFERENCES viajes (id) ON DELETE CASCADE
+);
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🚀 Instalación y Configuración
+
+### 1. Clonar el repositorio
 
 ```bash
-ng generate --help
+git clone <tu-repositorio>
+cd deliver-app
 ```
 
-## Building
-
-To build the project run:
+### 2. Instalar dependencias
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### 3. Configurar Supabase
 
-## Running unit tests
+1. Crear un proyecto en [Supabase](https://supabase.com)
+2. Ejecutar las consultas SQL para crear las tablas
+3. **Si ya tienes datos existentes**, ejecutar el script `database_update.sql` para agregar los nuevos campos
+4. Obtener la URL y API Key de tu proyecto
+5. Actualizar `src/app/environment/environment.ts`:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+```typescript
+export const environment = {
+  production: false,
+  supabaseUrl: "TU_SUPABASE_URL",
+  supabaseKey: "TU_SUPABASE_ANON_KEY",
+};
+```
+
+### 4. Ejecutar la aplicación
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+La aplicación estará disponible en `http://localhost:4200`
 
-For end-to-end (e2e) testing, run:
+## 📱 Funcionalidades
+
+### Gestión de Viajes
+
+- ✅ Crear nuevos viajes con fecha y descripción
+- ✅ Editar viajes existentes
+- ✅ Eliminar viajes (elimina también todos los clientes asociados)
+- ✅ Visualizar lista de viajes ordenados por fecha
+
+### Gestión de Clientes
+
+- ✅ Agregar clientes a un viaje específico
+- ✅ Editar información de clientes
+- ✅ Eliminar clientes
+- ✅ Marcar/desmarcar paquetes como entregados
+- ✅ Visualizar estadísticas del viaje
+
+### Características Adicionales
+
+- 📊 Dashboard con métricas en tiempo real
+- 🔍 Búsqueda y filtrado
+- 📱 Diseño responsive para móviles
+- ⚡ Carga rápida con lazy loading
+- 🎨 Interfaz moderna y intuitiva
+
+## 🗂️ Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── components/
+│   │   ├── viajes/
+│   │   │   ├── viajes-list/     # Lista de viajes
+│   │   │   └── viaje-form/      # Formulario de viajes
+│   │   └── clientes/
+│   │       ├── clientes-list/   # Lista de clientes
+│   │       └── cliente-form/    # Formulario de clientes
+│   ├── models/
+│   │   ├── viaje.model.ts       # Interfaces de Viaje
+│   │   └── cliente.model.ts     # Interfaces de Cliente
+│   ├── services/
+│   │   ├── supabase.service.ts  # Servicio de Supabase
+│   │   ├── viajes.service.ts    # Servicio de Viajes
+│   │   └── clientes.service.ts  # Servicio de Clientes
+│   ├── environment/
+│   │   └── environment.ts        # Configuración de Supabase
+│   └── app.routes.ts            # Configuración de rutas
+```
+
+## 🔧 Comandos Disponibles
 
 ```bash
-ng e2e
+# Desarrollo
+npm start                    # Servidor de desarrollo
+npm run build               # Build para producción
+npm run watch               # Build con watch mode
+
+# Testing
+npm test                    # Ejecutar tests
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 📝 Uso de la Aplicación
 
-## Additional Resources
+1. **Inicio**: La aplicación inicia mostrando la lista de viajes
+2. **Crear Viaje**: Haz clic en "Nuevo Viaje" para crear un viaje
+3. **Gestionar Clientes**: Desde un viaje, haz clic en "Clientes" para ver/agregar clientes
+4. **Marcar Entregas**: Usa los botones de estado para marcar paquetes como entregados
+5. **Estadísticas**: Ve métricas en tiempo real en el dashboard de clientes
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 🆘 Soporte
+
+Si tienes problemas o preguntas:
+
+1. Revisa la documentación de [Angular](https://angular.dev)
+2. Consulta la documentación de [Supabase](https://supabase.com/docs)
+3. Abre un issue en este repositorio
+
+---
+
+**Desarrollado con ❤️ usando Angular 20 + Bootstrap + Supabase**
