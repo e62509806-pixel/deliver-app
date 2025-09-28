@@ -127,14 +127,14 @@
               <div class="dropdown-menu" [class.show]="showListadoMenu">
                 <button
                   class="dropdown-item"
-                  (click)="generatePDF(); closeMenus()"
+                  (click)="generateListadoPDF(); closeMenus()"
                   [disabled]="selectedClientes.size === 0"
                 >
                   <i class="fas fa-file-pdf"></i> Generar PDF
                 </button>
                 <button
                   class="dropdown-item"
-                  (click)="printPDF(); closeMenus()"
+                  (click)="printListadoPDF(); closeMenus()"
                   [disabled]="selectedClientes.size === 0"
                 >
                   <i class="fas fa-print"></i> Imprimir
