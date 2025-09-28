@@ -151,7 +151,6 @@ export class ClientesList implements OnInit {
     return this.clientes.filter((c) => this.selectedClientes.has(c.id!));
   }
 
-  // ✅ PDF / Imprimir
   generatePDF(returnDoc = false): jsPDF | void {
     const selectedClientes = this.getSelectedClientes();
     if (selectedClientes.length === 0) {
@@ -163,7 +162,7 @@ export class ClientesList implements OnInit {
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 6;
     const tableWidth = pageWidth - margin * 2;
-    let yPosition = margin;
+    let yPosition = margin + 2;
 
     const colPercents = [2, 20, 10, 4, 12, 12, 20, 20];
     const colWidths = colPercents.map((p) => (p / 100) * tableWidth);
@@ -189,11 +188,10 @@ export class ClientesList implements OnInit {
       xPosition += cellWidth;
     });
 
-    yPosition += 6;
+    yPosition += 2;
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 3;
+    yPosition += 6;
 
-    // Filas
     doc.setFont('helvetica', 'normal').setFontSize(8);
     selectedClientes.forEach((cliente) => {
       if (yPosition > doc.internal.pageSize.getHeight() - 15) {
@@ -206,7 +204,7 @@ export class ClientesList implements OnInit {
         cliente.name || '',
         cliente.destination || '',
         cliente.packages?.toString() || '',
-        cliente.phone?.toString() || '-',
+        `+ ${cliente.phone?.toString()}` || '-',
         cliente.identity_card?.toString() || '-',
         cliente.family_name || '-',
         cliente.description || '-',
@@ -251,7 +249,6 @@ export class ClientesList implements OnInit {
     }
   }
 
-  // ✅ Menús desplegables
   toggleListadoMenu() {
     this.showListadoMenu = !this.showListadoMenu;
     this.showEtiquetasMenu = false;
@@ -267,7 +264,6 @@ export class ClientesList implements OnInit {
     this.showEtiquetasMenu = false;
   }
 
-  // ✅ Generación de etiquetas
   generateEtiquetasPDF(returnDoc = false): jsPDF | void {
     const selectedClientes = this.getSelectedClientes();
     if (selectedClientes.length === 0) {
@@ -279,47 +275,39 @@ export class ClientesList implements OnInit {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 5;
-    const labelWidth = (pageWidth - margin * 2) / 2; // 2 etiquetas por fila, sin espacio entre ellas
-    const labelHeight = 85; // Aumentado para el logo
-    const labelSpacing = 0; // Sin espacio entre etiquetas
+    const labelWidth = (pageWidth - margin * 2) / 2;
+    const labelHeight = 90;
+    const labelSpacing = 0;
 
     let currentX = margin;
     let currentY = margin;
     let labelCount = 0;
 
     selectedClientes.forEach((cliente) => {
-      // Verificar si necesitamos una nueva página
       if (currentY + labelHeight > pageHeight - margin) {
         doc.addPage();
         currentX = margin;
         currentY = margin;
       }
 
-      // Dibujar borde de la etiqueta
       doc.rect(currentX, currentY, labelWidth, labelHeight);
 
-      // Logo en la parte superior
       try {
-        const logoWidth = 18; // Logo más grande
-        const logoHeight = 18; // Logo más grande
-        const logoX = currentX + (labelWidth - logoWidth) / 2; // Centrado
+        const logoWidth = 18;
+        const logoHeight = 18;
+        const logoX = currentX + (labelWidth - logoWidth) / 2;
         const logoY = currentY + 2;
 
-        // Agregar el logo (si existe)
         doc.addImage('/logo.png', 'PNG', logoX, logoY, logoWidth, logoHeight);
       } catch (error) {
-        // Si no se puede cargar el logo, continuar sin él
         console.log('Logo no encontrado, continuando sin logo');
       }
 
-      // Contenido de la etiqueta (empezar después del logo)
-      let yPos = currentY + 24; // Más espacio para el logo más grande
-      const lineHeight = 14; // Líneas un poco más separadas
+      let yPos = currentY + 24;
+      const lineHeight = 14;
 
-      // Información en línea
-      doc.setFontSize(14).setFont('helvetica', 'bold'); // Fuente más grande
+      doc.setFontSize(14).setFont('helvetica', 'bold');
 
-      // Función para agregar texto con salto de línea automático
       const addTextWithWrap = (
         text: string,
         x: number,
@@ -330,13 +318,12 @@ export class ClientesList implements OnInit {
         lines.forEach((line: string, index: number) => {
           doc.text(line, x, y + index * 4);
         });
-        return lines.length * 4; // Retorna la altura usada
+        return lines.length * 4;
       };
 
-      const textMargin = 2;
+      const textMargin = 4;
       const maxTextWidth = labelWidth - textMargin * 2;
 
-      // Destinatario
       const destinatario = cliente.family_name || cliente.name;
       const destinatarioText = `Destinatario: ${destinatario}`;
       const destinatarioHeight = addTextWithWrap(
@@ -345,10 +332,9 @@ export class ClientesList implements OnInit {
         yPos,
         maxTextWidth
       );
-      yPos += destinatarioHeight + 6;
+      yPos += destinatarioHeight + 10;
 
-      // Teléfono
-      const telefono = cliente.phone ? `+53 ${cliente.phone}` : 'No disponible';
+      const telefono = cliente.phone ? `+ ${cliente.phone}` : 'No disponible';
       const telefonoText = `Teléfono: ${telefono}`;
       const telefonoHeight = addTextWithWrap(
         telefonoText,
@@ -356,9 +342,8 @@ export class ClientesList implements OnInit {
         yPos,
         maxTextWidth
       );
-      yPos += telefonoHeight + 6;
+      yPos += telefonoHeight + 10;
 
-      // CI
       const ci = cliente.identity_card
         ? cliente.identity_card.toString()
         : 'No disponible';
@@ -369,9 +354,8 @@ export class ClientesList implements OnInit {
         yPos,
         maxTextWidth
       );
-      yPos += ciHeight + 6;
+      yPos += ciHeight + 10;
 
-      // Municipio
       const municipioText = `Municipio: ${cliente.destination}`;
       const municipioHeight = addTextWithWrap(
         municipioText,
@@ -379,20 +363,16 @@ export class ClientesList implements OnInit {
         yPos,
         maxTextWidth
       );
-      yPos += municipioHeight + 6;
+      yPos += municipioHeight + 10;
 
-      // Enviado por
       const enviadoText = `Enviado por: ${cliente.name}`;
       addTextWithWrap(enviadoText, currentX + textMargin, yPos, maxTextWidth);
 
-      // Mover a la siguiente etiqueta
       labelCount++;
       if (labelCount % 2 === 0) {
-        // Nueva fila
         currentX = margin;
         currentY += labelHeight + labelSpacing;
       } else {
-        // Misma fila, siguiente columna
         currentX += labelWidth;
       }
     });
