@@ -2,12 +2,11 @@ export interface Cliente {
   id?: number;
   number: number;
   name: string;
-  identity_card?: number;
+  identity_card?: number | null;
   destination: string;
   packages: number;
   family_name?: string;
-  phone?: string;
-  familiar?: string;
+  phone?: number | null;
   description?: string;
   delivered: boolean;
   viaje_id: number;
@@ -16,12 +15,11 @@ export interface Cliente {
 export interface ClienteCreate {
   number: number;
   name: string;
-  identity_card?: number;
+  identity_card?: number | null;
   destination: string;
   packages: number;
   family_name?: string;
-  phone?: string;
-  familiar?: string;
+  phone?: number | null;
   description?: string;
   delivered?: boolean;
   viaje_id: number;
@@ -30,12 +28,11 @@ export interface ClienteCreate {
 export interface ClienteUpdate {
   number?: number;
   name?: string;
-  identity_card?: number;
+  identity_card?: number | null;
   destination?: string;
   packages?: number;
   family_name?: string;
-  phone?: string;
-  familiar?: string;
+  phone?: number | null;
   description?: string;
   delivered?: boolean;
   viaje_id?: number;

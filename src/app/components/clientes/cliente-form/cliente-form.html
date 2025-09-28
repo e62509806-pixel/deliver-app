@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="family_name" class="form-label">Apellido</label>
+                  <label for="family_name" class="form-label">Familiar</label>
                   <input
                     type="text"
                     class="form-control"
@@ -113,25 +113,12 @@
                 <div class="mb-3">
                   <label for="phone" class="form-label">Teléfono</label>
                   <input
-                    type="tel"
+                    type="number"
                     class="form-control"
                     id="phone"
                     name="phone"
                     [(ngModel)]="cliente.phone"
-                    placeholder="Ej: +1234567890"
-                    [disabled]="loading"
-                  />
-                </div>
-
-                <div class="mb-3">
-                  <label for="familiar" class="form-label">Familiar</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="familiar"
-                    name="familiar"
-                    [(ngModel)]="cliente.familiar"
-                    placeholder="Nombre del familiar"
+                    placeholder="Ej: 5385214796"
                     [disabled]="loading"
                   />
                 </div>
