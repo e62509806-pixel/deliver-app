@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ViajesService } from '../../../services/viajes.service';
+import { ClientesService } from '../../../services/clientes.service';
 import { Viaje } from '../../../models/viaje.model';
+import { Cliente } from '../../../models/cliente.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,10 +15,15 @@ import { Router } from '@angular/router';
 })
 export class ViajesList implements OnInit {
   viajes: Viaje[] = [];
+  allClientes: Cliente[] = [];
   loading = false;
   error: string | null = null;
 
-  constructor(private viajesService: ViajesService, private router: Router) {}
+  constructor(
+    private viajesService: ViajesService,
+    private clientesService: ClientesService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadViajes();
@@ -27,6 +34,7 @@ export class ViajesList implements OnInit {
     this.error = null;
     try {
       this.viajes = await this.viajesService.getViajes();
+      this.allClientes = await this.clientesService.getAllClientes();
     } catch (error) {
       this.error = 'Error al cargar los viajes';
       console.error('Error loading viajes:', error);
@@ -61,5 +69,38 @@ export class ViajesList implements OnInit {
 
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('es-ES');
+  }
+
+  // Métodos para estadísticas generales
+  getTotalViajes(): number {
+    return this.viajes.length;
+  }
+
+  getTotalClientes(): number {
+    return this.allClientes.length;
+  }
+
+  getTotalPaquetes(): number {
+    return this.allClientes.reduce(
+      (total, cliente) => total + cliente.packages,
+      0
+    );
+  }
+
+  getClientesEntregados(): number {
+    return this.allClientes.filter((cliente) => cliente.delivered).length;
+  }
+
+  getClientesPendientes(): number {
+    return this.allClientes.filter((cliente) => !cliente.delivered).length;
+  }
+
+  getPorcentajeEntregado(): number {
+    if (this.getTotalClientes() === 0) {
+      return 0;
+    }
+    return Math.round(
+      (this.getClientesEntregados() / this.getTotalClientes()) * 100
+    );
   }
 }

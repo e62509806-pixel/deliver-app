@@ -26,37 +26,81 @@
       <!-- Estadísticas -->
       @if (clientes.length > 0) {
       <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="card bg-primary text-white">
-            <div class="card-body text-center">
-              <h5 class="card-title">{{ clientes.length }}</h5>
-              <p class="card-text mb-0">Total Clientes</p>
+        <div class="col-md-3 mb-3 mb-md-0">
+          <div
+            class="card border-0 shadow-sm"
+            style="
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            "
+          >
+            <div class="card-body text-white">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-users fa-2x opacity-75 me-3"></i>
+                <div>
+                  <h4 class="card-title mb-0 fw-bold">{{ clientes.length }}</h4>
+                  <p class="card-text mb-0 small opacity-90">Total Clientes</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-success text-white">
-            <div class="card-body text-center">
-              <h5 class="card-title">{{ getDeliveredCount() }}</h5>
-              <p class="card-text mb-0">Entregados</p>
+        <div class="col-md-3 mb-3 mb-md-0">
+          <div
+            class="card border-0 shadow-sm"
+            style="
+              background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            "
+          >
+            <div class="card-body text-white">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle fa-2x opacity-75 me-3"></i>
+                <div>
+                  <h4 class="card-title mb-0 fw-bold">
+                    {{ getDeliveredCount() }}
+                  </h4>
+                  <p class="card-text mb-0 small opacity-90">Entregados</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-warning text-white">
-            <div class="card-body text-center">
-              <h5 class="card-title">
-                {{ clientes.length - getDeliveredCount() }}
-              </h5>
-              <p class="card-text mb-0">Pendientes</p>
+        <div class="col-md-3 mb-3 mb-md-0">
+          <div
+            class="card border-0 shadow-sm"
+            style="
+              background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            "
+          >
+            <div class="card-body text-white">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-clock fa-2x opacity-75 me-3"></i>
+                <div>
+                  <h4 class="card-title mb-0 fw-bold">
+                    {{ clientes.length - getDeliveredCount() }}
+                  </h4>
+                  <p class="card-text mb-0 small opacity-90">Pendientes</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-info text-white">
-            <div class="card-body text-center">
-              <h5 class="card-title">{{ getTotalPackages() }}</h5>
-              <p class="card-text mb-0">Total Paquetes</p>
+        <div class="col-md-3 mb-3 mb-md-0">
+          <div
+            class="card border-0 shadow-sm"
+            style="
+              background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            "
+          >
+            <div class="card-body text-white">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-box fa-2x opacity-75 me-3"></i>
+                <div>
+                  <h4 class="card-title mb-0 fw-bold">
+                    {{ getTotalPackages() }}
+                  </h4>
+                  <p class="card-text mb-0 small opacity-90">Total Paquetes</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
