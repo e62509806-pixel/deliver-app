@@ -121,7 +121,7 @@
         <p>Comienza agregando clientes a este viaje.</p>
         <hr />
         <button class="btn btn-primary" (click)="addCliente()">
-          Agregar Primer Cliente
+          Agregar Cliente
         </button>
       </div>
       } @else {
@@ -156,7 +156,7 @@
                 <button
                   class="btn btn-sm"
                   [class.btn-success]="cliente.delivered"
-                  [class.btn-outline-success]="!cliente.delivered"
+                  [class.btn-outline-danger]="!cliente.delivered"
                   (click)="toggleDelivered(cliente)"
                 >
                   @if (cliente.delivered) {

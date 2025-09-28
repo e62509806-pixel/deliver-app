@@ -10,4 +10,13 @@ import { CommonModule } from '@angular/common';
 })
 export class App {
   protected readonly title = signal('deliver-app');
+  isMenuOpen = false;
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
 }
