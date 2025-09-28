@@ -98,6 +98,29 @@ export class ClientesList implements OnInit {
       console.error(error);
     }
   }
+  
+  async markSelectedAsDelivered() {
+    if (this.selectedClientes.size === 0) return;
+    
+    try {
+      const promises = [];
+      for (const cliente of this.clientes) {
+        if (this.selectedClientes.has(cliente.id!) && !cliente.delivered) {
+          promises.push(
+            this.clientesService.toggleDelivered(cliente.id!, true)
+          );
+          cliente.delivered = true;
+        }
+      }
+      
+      await Promise.all(promises);
+      this.selectedClientes.clear();
+      this.selectAll = false;
+    } catch (error) {
+      this.error = 'Error al marcar clientes como entregados';
+      console.error(error);
+    }
+  }
 
   editCliente(id: number) {
     this.router.navigate(['/clientes/edit', id]);

@@ -25,7 +25,7 @@ export class ClientesListService {
     const tableWidth = pageWidth - margin * 2;
     let yPosition = margin + 2;
 
-    const colPercents = [2, 20, 10, 4, 12, 12, 20, 20];
+    const colPercents = [3, 20, 10, 3, 12, 12, 20, 20];
     const colWidths = colPercents.map((p) => (p / 100) * tableWidth);
 
     // Encabezados
@@ -60,8 +60,13 @@ export class ClientesListService {
         yPosition = margin;
       }
 
+      // Añadir check si el cliente está entregado
+      const numeroConCheck = cliente.delivered
+        ? `* ${cliente.number?.toString() || ''}`
+        : cliente.number?.toString() || '';
+
       const rowData = [
-        cliente.number?.toString() || '',
+        numeroConCheck,
         cliente.name || '',
         cliente.destination || '',
         cliente.packages?.toString() || '',
