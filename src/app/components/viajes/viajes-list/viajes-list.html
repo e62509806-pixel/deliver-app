@@ -8,111 +8,8 @@
         </button>
       </div>
 
-      <!-- Estadísticas Generales -->
-      @if (viajes.length > 0) {
-      <div class="row mb-4">
-        <div class="col-lg col-md-6 mb-3 mb-lg-0">
-          <div
-            class="card border-0 shadow-sm"
-            style="
-              background: linear-gradient(135deg, #4a4531 0%, #d1c477 100%);
-            "
-          >
-            <div class="card-body text-white">
-              <div class="d-flex align-items-center">
-                <i class="fas fa-route fa-2x opacity-75 me-3"></i>
-                <div>
-                  <h4 class="card-title mb-0 fw-bold">
-                    {{ getTotalViajes() }}
-                  </h4>
-                  <p class="card-text mb-0 small opacity-90">Viajes</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg col-md-6 mb-3 mb-lg-0">
-          <div
-            class="card border-0 shadow-sm"
-            style="
-              background: linear-gradient(135deg, #130c1a 0%, #667eea 100%);
-            "
-          >
-            <div class="card-body text-white">
-              <div class="d-flex align-items-center">
-                <i class="fas fa-users fa-2x opacity-75 me-3"></i>
-                <div>
-                  <h4 class="card-title mb-0 fw-bold">
-                    {{ getTotalClientes() }}
-                  </h4>
-                  <p class="card-text mb-0 small opacity-90">Clientes</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg col-md-6 mb-3 mb-lg-0">
-          <div
-            class="card border-0 shadow-sm"
-            style="
-              background: linear-gradient(135deg, #064e52 0%, #4facfe 100%);
-            "
-          >
-            <div class="card-body text-white">
-              <div class="d-flex align-items-center">
-                <i class="fas fa-box fa-2x opacity-75 me-3"></i>
-                <div>
-                  <h4 class="card-title mb-0 fw-bold">
-                    {{ getTotalPaquetes() }}
-                  </h4>
-                  <p class="card-text mb-0 small opacity-90">Paquetes</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg col-md-6 mb-3 mb-lg-0">
-          <div
-            class="card border-0 shadow-sm"
-            style="
-              background: linear-gradient(135deg, #562020 0%, #d96262 100%);
-            "
-          >
-            <div class="card-body text-white">
-              <div class="d-flex align-items-center">
-                <i class="fas fa-clock fa-2x opacity-75 me-3"></i>
-                <div>
-                  <h4 class="card-title mb-0 fw-bold">
-                    {{ getClientesPendientes() }}
-                  </h4>
-                  <p class="card-text mb-0 small opacity-90">Pendientes</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg col-md-6 mb-3 mb-lg-0">
-          <div
-            class="card border-0 shadow-sm"
-            style="
-              background: linear-gradient(135deg, #1e492e 0%, #38ef7d 100%);
-            "
-          >
-            <div class="card-body text-white">
-              <div class="d-flex align-items-center">
-                <i class="fas fa-percentage fa-2x opacity-75 me-3"></i>
-                <div>
-                  <h4 class="card-title mb-0 fw-bold">
-                    {{ getPorcentajeEntregado() }}%
-                  </h4>
-                  <p class="card-text mb-0 small opacity-90">Entregado</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      } @if (error) {
+      <!-- Las estadísticas generales han sido eliminadas -->
+      @if (error) {
       <div class="alert alert-danger" role="alert">
         {{ error }}
       </div>
@@ -136,14 +33,52 @@
         @for (viaje of viajes; track viaje.id) {
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100">
+            <div class="card-header">
+              <h5 class="card-title text-center mt-2">Viaje #{{ viaje.id }}</h5>
+            </div>
             <div class="card-body">
-              <h5 class="card-title">Viaje #{{ viaje.id }}</h5>
-              <p class="card-text">
-                <strong>Fecha:</strong> {{ formatDate(viaje.date) }}<br />
-                @if (viaje.description) {
-                <strong>Descripción:</strong> {{ viaje.description }}
-                }
-              </p>
+              <!-- Contenido en dos columnas (responsive) -->
+              <div class="row">
+                <!-- Columna izquierda: Información del viaje -->
+                <div class="col-6">
+                  <p class="card-text">
+                    <strong>Fecha:</strong>
+                    {{ formatDate(viaje.date) }}
+                  </p>
+                  <p class="card-text">
+                    @if (viaje.description) {
+                    <strong>Descripción:</strong><br />
+                    {{ viaje.description }}
+                    }
+                  </p>
+                </div>
+
+                <!-- Columna derecha: Estadísticas -->
+                <div class="col-6">
+                  <div class="d-flex flex-column">
+                    <div class="mb-2">
+                      <i class="fas fa-users text-primary"></i>
+                      <strong> Clientes:</strong>
+                      {{ getClientesByViaje(viaje.id!) }}
+                    </div>
+                    <div class="mb-2">
+                      <i class="fas fa-box text-secondary"></i>
+                      <strong> Paquetes:</strong>
+                      {{ getPaquetesByViaje(viaje.id!) }}
+                    </div>
+                    <div class="mb-2">
+                      <i class="fas fa-check-circle text-success"></i>
+                      <strong> Entregados:</strong>
+                      {{ getEntregadosByViaje(viaje.id!) }}
+                    </div>
+                    <div>
+                      <i class="fas fa-clock text-danger"></i>
+                      <strong> Pendientes:</strong>
+                      {{ getPendientesByViaje(viaje.id!) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="card-footer">
               <div class="btn-group w-100" role="group">

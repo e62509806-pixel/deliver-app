@@ -71,7 +71,7 @@ export class ViajeForm implements OnInit {
       if (this.isEdit && this.viajeId) {
         const updateData: ViajeUpdate = {
           date: this.viaje.date,
-          description: this.viaje.description || undefined,
+          description: this.viaje.description || '',
         };
         await this.viajesService.updateViaje(this.viajeId, updateData);
       } else {

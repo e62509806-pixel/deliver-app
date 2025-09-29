@@ -103,4 +103,23 @@ export class ViajesList implements OnInit {
       (this.getClientesEntregados() / this.getTotalClientes()) * 100
     );
   }
+  
+  // Métodos para estadísticas por viaje
+  getClientesByViaje(viajeId: number): number {
+    return this.allClientes.filter(cliente => cliente.viaje_id === viajeId).length;
+  }
+  
+  getEntregadosByViaje(viajeId: number): number {
+    return this.allClientes.filter(cliente => cliente.viaje_id === viajeId && cliente.delivered).length;
+  }
+  
+  getPendientesByViaje(viajeId: number): number {
+    return this.allClientes.filter(cliente => cliente.viaje_id === viajeId && !cliente.delivered).length;
+  }
+  
+  getPaquetesByViaje(viajeId: number): number {
+    return this.allClientes
+      .filter(cliente => cliente.viaje_id === viajeId)
+      .reduce((total, cliente) => total + (cliente.packages || 0), 0);
+  }
 }
