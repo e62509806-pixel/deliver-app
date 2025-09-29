@@ -30,6 +30,8 @@ export class ClientesList implements OnInit {
   showListadoMenu = false;
   showEtiquetasMenu = false;
 
+  selectedAsDelivered: boolean = true;
+
   constructor(
     private clientesService: ClientesService,
     private viajesService: ViajesService,
@@ -101,15 +103,18 @@ export class ClientesList implements OnInit {
 
   async markSelectedAsDelivered() {
     if (this.selectedClientes.size === 0) return;
-
+    this.selectedAsDelivered = !this.selectedAsDelivered;
     try {
       const promises = [];
       for (const cliente of this.clientes) {
-        if (this.selectedClientes.has(cliente.id!) && !cliente.delivered) {
+        if (this.selectedClientes.has(cliente.id!)) {
           promises.push(
-            this.clientesService.toggleDelivered(cliente.id!, true)
+            this.clientesService.toggleDelivered(
+              cliente.id!,
+              this.selectedAsDelivered
+            )
           );
-          cliente.delivered = true;
+          cliente.delivered = this.selectedAsDelivered;
         }
       }
 

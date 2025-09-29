@@ -86,6 +86,8 @@ export class ClientesService {
   }
 
   async toggleDelivered(id: number, delivered: boolean): Promise<Cliente> {
+    console.log(delivered);
+
     const { data, error } = await this.supabase.client
       .from('clientes')
       .update({ delivered })
