@@ -98,10 +98,10 @@ export class ClientesList implements OnInit {
       console.error(error);
     }
   }
-  
+
   async markSelectedAsDelivered() {
     if (this.selectedClientes.size === 0) return;
-    
+
     try {
       const promises = [];
       for (const cliente of this.clientes) {
@@ -112,7 +112,7 @@ export class ClientesList implements OnInit {
           cliente.delivered = true;
         }
       }
-      
+
       await Promise.all(promises);
       this.selectedClientes.clear();
       this.selectAll = false;
@@ -215,5 +215,15 @@ export class ClientesList implements OnInit {
   printEtiquetasPDF() {
     const selectedClientes = this.getSelectedClientes();
     this.pdfService.printEtiquetasPDF(selectedClientes, this.viaje);
+  }
+
+  generateListadoWord() {
+    const selectedClientes = this.getSelectedClientes();
+    return this.pdfService.generateListadoWord(selectedClientes, this.viaje);
+  }
+
+  generateEtiquetasWord() {
+    const selectedClientes = this.getSelectedClientes();
+    return this.pdfService.generateEtiquetasWord(selectedClientes, this.viaje);
   }
 }

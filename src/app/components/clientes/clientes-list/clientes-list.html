@@ -134,6 +134,13 @@
                 </button>
                 <button
                   class="dropdown-item"
+                  (click)="generateListadoWord(); closeMenus()"
+                  [disabled]="selectedClientes.size === 0"
+                >
+                  <i class="fas fa-file-word"></i> Generar Word
+                </button>
+                <button
+                  class="dropdown-item"
                   (click)="printListadoPDF(); closeMenus()"
                   [disabled]="selectedClientes.size === 0"
                 >
@@ -164,6 +171,13 @@
                   [disabled]="selectedClientes.size === 0"
                 >
                   <i class="fas fa-file-pdf"></i> Generar PDF
+                </button>
+                <button
+                  class="dropdown-item"
+                  (click)="generateEtiquetasWord(); closeMenus()"
+                  [disabled]="selectedClientes.size === 0"
+                >
+                  <i class="fas fa-file-word"></i> Generar Word
                 </button>
                 <button
                   class="dropdown-item"

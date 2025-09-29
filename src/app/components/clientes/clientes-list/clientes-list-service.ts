@@ -1,6 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Cliente } from '../../../models/cliente.model';
 import { Viaje } from '../../../models/viaje.model';
+import {
+  Document,
+  Packer,
+  Paragraph,
+  Table,
+  TableRow,
+  TableCell,
+  AlignmentType,
+  WidthType,
+  TextRun,
+  BorderStyle,
+  ImageRun,
+} from 'docx';
+import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 
 @Injectable({
@@ -28,7 +42,6 @@ export class ClientesListService {
     const colPercents = [3, 20, 10, 3, 12, 12, 20, 20];
     const colWidths = colPercents.map((p) => (p / 100) * tableWidth);
 
-    // Encabezados
     doc.setFontSize(9).setFont('helvetica', 'bold');
     const headers = [
       '#',
@@ -49,9 +62,9 @@ export class ClientesListService {
       xPosition += cellWidth;
     });
 
-    yPosition += 3; // Espacio entre encabezados y línea
+    yPosition += 3;
     doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 6; // Aumentar espacio entre línea y contenido
+    yPosition += 6;
 
     doc.setFont('helvetica', 'normal').setFontSize(8);
     selectedClientes.forEach((cliente) => {
@@ -60,7 +73,6 @@ export class ClientesListService {
         yPosition = margin;
       }
 
-      // Añadir check si el cliente está entregado
       const numeroConCheck = cliente.delivered
         ? `* ${cliente.number?.toString() || ''}`
         : cliente.number?.toString() || '';
@@ -258,5 +270,234 @@ export class ClientesListService {
         printWindow.print();
       });
     }
+  }
+
+  async generateListadoWord(selectedClientes: Cliente[], viaje: Viaje | null) {
+    if (selectedClientes.length === 0) {
+      alert('Por favor selecciona al menos un cliente');
+      return;
+    }
+
+    const colPercents = [3, 20, 10, 3, 12, 12, 20, 20];
+
+    const headers = [
+      '#',
+      'Nombre cliente',
+      'Destino',
+      'Paq.',
+      'Teléfono',
+      'CI',
+      'Familiar',
+      'Anotaciones',
+    ];
+
+    const tableRows: TableRow[] = [
+      new TableRow({
+        children: headers.map(
+          (header, i) =>
+            new TableCell({
+              width: { size: colPercents[i], type: WidthType.PERCENTAGE },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({ text: header, bold: true, size: 16 }),
+                  ],
+                }),
+              ],
+            })
+        ),
+      }),
+    ];
+
+    selectedClientes.forEach((cliente) => {
+      const numeroConCheck = cliente.delivered
+        ? `* ${cliente.number?.toString() || ''}`
+        : cliente.number?.toString() || '';
+
+      const rowData = [
+        numeroConCheck,
+        cliente.name || '',
+        cliente.destination || '',
+        cliente.packages?.toString() || '',
+        cliente.phone ? `+ ${cliente.phone}` : '-',
+        cliente.identity_card?.toString() || '-',
+        cliente.family_name || '-',
+        cliente.description || '-',
+      ];
+
+      tableRows.push(
+        new TableRow({
+          children: rowData.map(
+            (data, i) =>
+              new TableCell({
+                width: { size: colPercents[i], type: WidthType.PERCENTAGE },
+                children: [
+                  new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({ text: data, size: 16 })],
+                  }),
+                ],
+              })
+          ),
+        })
+      );
+    });
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: {
+                top: 200,
+                bottom: 200,
+                left: 200,
+                right: 200,
+              },
+            },
+          },
+          children: [
+            new Table({
+              rows: tableRows,
+              width: { size: 100, type: WidthType.PERCENTAGE },
+            }),
+          ],
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(
+      blob,
+      `clientes_viaje_${viaje?.id || 'sin_viaje'}_${
+        new Date().toISOString().split('T')[0]
+      }.docx`
+    );
+  }
+
+  async generateEtiquetasWord(
+    selectedClientes: Cliente[],
+    viaje: Viaje | null
+  ) {
+    if (selectedClientes.length === 0) {
+      alert('Por favor selecciona al menos un cliente');
+      return;
+    }
+
+    let logoData: Uint8Array | undefined;
+    try {
+      const res = await fetch('/logo.png');
+      if (res.ok) {
+        const ab = await res.arrayBuffer();
+        logoData = new Uint8Array(ab);
+      }
+    } catch {
+      console.log('Logo no disponible, continuar sin logo');
+    }
+
+    const tableRows: TableRow[] = [];
+
+    const makeCell = (cliente?: Cliente) => {
+      if (!cliente) {
+        return new TableCell({
+          children: [new Paragraph({ text: '' })],
+          width: { size: 50, type: WidthType.PERCENTAGE },
+          borders: {
+            top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+            bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+            left: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+            right: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+          },
+          margins: { top: 50, bottom: 100, left: 250, right: 250 },
+        });
+      }
+
+      const destinatario = cliente.family_name || cliente.name || '';
+      const telefono = cliente.phone ? `+ ${cliente.phone}` : 'No disponible';
+      const ci = cliente.identity_card?.toString() || 'No disponible';
+      const municipio = cliente.destination || '';
+      const enviado = cliente.name || '';
+
+      const children: Paragraph[] = [];
+
+      if (logoData) {
+        children.push(
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            children: [
+              new ImageRun({
+                data: logoData,
+                type: 'png',
+                transformation: { width: 60, height: 60 },
+              }),
+            ],
+            spacing: { after: 100 },
+          })
+        );
+      }
+
+      const addLine = (text: string) => {
+        children.push(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [new TextRun({ text, bold: true, size: 28 })],
+            spacing: { after: 300 },
+          })
+        );
+      };
+
+      addLine(`Destinatario: ${destinatario}`);
+      addLine(`Teléfono: ${telefono}`);
+      addLine(`CI: ${ci}`);
+      addLine(`Municipio: ${municipio}`);
+      addLine(`Enviado por: ${enviado}`);
+
+      return new TableCell({
+        children,
+        margins: { top: 500, bottom: 500, left: 250, right: 250 },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+          bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+          left: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+          right: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+        },
+        width: { size: 50, type: WidthType.PERCENTAGE },
+      });
+    };
+
+    for (let i = 0; i < selectedClientes.length; i += 2) {
+      const leftCell = makeCell(selectedClientes[i]);
+      const rightCell = makeCell(selectedClientes[i + 1]);
+      tableRows.push(
+        new TableRow({ children: [leftCell, rightCell], cantSplit: true })
+      );
+    }
+
+    const table = new Table({
+      rows: tableRows,
+      width: { size: 100, type: WidthType.PERCENTAGE },
+    });
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {
+            page: {
+              margin: { top: 200, bottom: 200, left: 200, right: 200 },
+            },
+          },
+          children: [table],
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(
+      blob,
+      `etiquetas_viaje_${viaje?.id || 'sin_viaje'}_${
+        new Date().toISOString().split('T')[0]
+      }.docx`
+    );
   }
 }
