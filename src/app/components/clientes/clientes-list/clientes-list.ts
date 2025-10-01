@@ -30,7 +30,7 @@ export class ClientesList implements OnInit {
   showListadoMenu = false;
   showEtiquetasMenu = false;
 
-  selectedAsDelivered: boolean = true;
+  selectedAsDelivered: boolean = false;
 
   constructor(
     private clientesService: ClientesService,

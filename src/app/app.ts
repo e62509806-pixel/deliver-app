@@ -4,7 +4,12 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    //RouterLinkActive,
+    CommonModule,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -12,11 +17,11 @@ export class App {
   protected readonly title = signal('deliver-app');
   isMenuOpen = false;
 
-  toggleMenu() {
+  /* toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
-  }
+  } */
 
-  closeMenu() {
+  /* closeMenu() {
     this.isMenuOpen = false;
-  }
+  } */
 }
