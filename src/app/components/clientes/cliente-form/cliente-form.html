@@ -164,7 +164,9 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="name" class="form-label">Nombre *</label>
+                  <label for="name" class="form-label"
+                    >Nombre de Cliente *</label
+                  >
                   <input
                     type="text"
                     class="form-control"
@@ -178,7 +180,7 @@
 
                 <div class="mb-3">
                   <label for="identity_card" class="form-label"
-                    >Cédula de Identidad</label
+                    >Carnet de ID</label
                   >
                   <input
                     type="number"
@@ -268,16 +270,48 @@
               </div>
             </div>
 
-            <!-- Descripción (ancho completo) -->
+            <!-- Dirección (ancho completo) -->
             <div class="mb-3">
-              <label for="description" class="form-label">Descripción</label>
+              <label for="address" class="form-label">Dirección</label>
+              <textarea
+                class="form-control"
+                id="address"
+                name="address"
+                [(ngModel)]="cliente.address"
+                rows="3"
+                placeholder="Dirección a enviar"
+                [disabled]="loading"
+              >
+              </textarea>
+            </div>
+
+            <!-- Checkbox para usar dirección en etiquetas -->
+            <div class="mb-3">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="is_address"
+                  name="is_address"
+                  [(ngModel)]="cliente.is_address"
+                  [disabled]="loading"
+                />
+                <label class="form-check-label" for="is_address">
+                  Usar dirección en etiquetas (en lugar de destino)
+                </label>
+              </div>
+            </div>
+
+            <!-- Anotaciones (ancho completo) -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Anotaciones</label>
               <textarea
                 class="form-control"
                 id="description"
                 name="description"
                 [(ngModel)]="cliente.description"
                 rows="3"
-                placeholder="Descripción adicional del cliente o paquetes"
+                placeholder="Anotaciones adicionales"
                 [disabled]="loading"
               >
               </textarea>

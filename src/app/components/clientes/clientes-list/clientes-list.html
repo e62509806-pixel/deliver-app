@@ -165,12 +165,13 @@
                 />
               </th>
               <th>#</th>
-              <th>Nombre</th>
-              <th>Cédula</th>
+              <th>Nombre Cliente</th>
               <th>Destino</th>
+              <th>Dirección</th>
               <th>Paquetes</th>
-              <th>Familiar</th>
               <th>Teléfono</th>
+              <th>Carnet de ID</th>
+              <th>Familiar</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -189,13 +190,30 @@
               </td>
               <td>{{ cliente.number }}</td>
               <td>{{ cliente.name }}</td>
-              <td>{{ cliente.identity_card || "-" }}</td>
               <td>{{ cliente.destination }}</td>
+              <td class="text-center">
+                @if (cliente.address) {
+                <button
+                  class="btn btn-sm"
+                  [class.btn-success]="cliente.is_address"
+                  [class.btn-outline-secondary]="!cliente.is_address"
+                  (click)="toggleAddressStatus(cliente)"
+                  [title]="cliente.address"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                >
+                  {{ cliente.is_address ? "Mostrar" : "Ocultar" }}
+                </button>
+                } @else {
+                <span class="text-muted">-</span>
+                }
+              </td>
               <td>
                 <span class="badge bg-primary">{{ cliente.packages }}</span>
               </td>
-              <td>{{ cliente.family_name || "-" }}</td>
               <td>+ {{ cliente.phone || "-" }}</td>
+              <td>{{ cliente.identity_card || "-" }}</td>
+              <td>{{ cliente.family_name || "-" }}</td>
               <td>
                 <button
                   class="btn btn-sm"

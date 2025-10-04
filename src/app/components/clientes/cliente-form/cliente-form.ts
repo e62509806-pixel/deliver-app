@@ -26,6 +26,8 @@ export class ClienteForm implements OnInit {
     packages: 1,
     family_name: '',
     phone: null,
+    address: '',
+    is_address: false,
     description: '',
     delivered: false,
     viaje_id: 0,
@@ -92,6 +94,8 @@ export class ClienteForm implements OnInit {
           family_name: cliente.family_name || '',
           phone: cliente.phone || null,
           description: cliente.description || '',
+          address: cliente.address || '',
+          is_address: cliente.is_address || false,
           delivered: cliente.delivered,
           viaje_id: cliente.viaje_id,
         };
@@ -123,6 +127,8 @@ export class ClienteForm implements OnInit {
           family_name: this.cliente.family_name || undefined,
           phone: this.cliente.phone || null,
           description: this.cliente.description || undefined,
+          address: this.cliente.address || undefined,
+          is_address: this.cliente.is_address || false,
           delivered: this.cliente.delivered,
         };
         await this.clientesService.updateCliente(this.clienteId, updateData);
@@ -208,6 +214,8 @@ export class ClienteForm implements OnInit {
       family_name: cliente.family_name || '',
       phone: cliente.phone,
       description: cliente.description || '',
+      address: cliente.address || '',
+      is_address: cliente.is_address || false,
       delivered: cliente.delivered,
       viaje_id: this.viajeId || 0,
     };

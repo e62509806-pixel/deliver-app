@@ -7,6 +7,8 @@ export interface Cliente {
   packages: number;
   family_name?: string;
   phone?: number | null;
+  address?: string;
+  is_address?: boolean;
   description?: string;
   delivered: boolean;
   viaje_id: number;
@@ -20,6 +22,8 @@ export interface ClienteCreate {
   packages: number;
   family_name?: string;
   phone?: number | null;
+  address?: string;
+  is_address?: boolean;
   description?: string;
   delivered?: boolean;
   viaje_id: number;
@@ -33,6 +37,8 @@ export interface ClienteUpdate {
   packages?: number;
   family_name?: string;
   phone?: number | null;
+  address?: string;
+  is_address?: boolean;
   description?: string;
   delivered?: boolean;
   viaje_id?: number;

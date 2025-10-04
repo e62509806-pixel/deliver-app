@@ -16,6 +16,7 @@ import {
 } from 'docx';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
+import autoTable, { UserOptions } from 'jspdf-autotable';
 
 @Injectable({
   providedIn: 'root',
@@ -34,72 +35,63 @@ export class ClientesListService {
     }
 
     const doc = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 6;
-    const tableWidth = pageWidth - margin * 2;
-    let yPosition = margin + 2;
 
-    const colPercents = [3, 20, 10, 3, 12, 12, 20, 20];
-    const colWidths = colPercents.map((p) => (p / 100) * tableWidth);
-
-    doc.setFontSize(9).setFont('helvetica', 'bold');
     const headers = [
-      '#',
-      'Nombre cliente',
+      ' ',
+      'Nombre Cliente Envía',
       'Destino',
-      'Paq.',
+      'Pqts',
       'Teléfono',
-      'CI',
+      'Carnet de ID',
       'Familiar',
       'Anotaciones',
     ];
 
-    let xPosition = margin;
-    headers.forEach((header, index) => {
-      const cellWidth = colWidths[index];
-      const cellCenter = xPosition + cellWidth / 2;
-      doc.text(header, cellCenter, yPosition, { align: 'center' });
-      xPosition += cellWidth;
+    const body = selectedClientes.map((cliente) => [
+      '',
+      ` ${cliente.number?.toString() || ''}. ${cliente.name}` || '',
+      cliente.destination || '',
+      cliente.packages?.toString() || '',
+      cliente.phone ? `+ ${cliente.phone}` : '',
+      cliente.identity_card?.toString() || '',
+      ` ${cliente.family_name}` || '',
+      cliente.address
+        ? `${cliente.address} | ${cliente.description || ''}`
+        : cliente.description || '',
+    ]);
+
+    // --- NUEVO: ancho de columnas por porcentaje ---
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 2;
+    const tableWidth = pageWidth - margin * 2;
+    const colPercents = [3, 20, 7, 5, 12, 12, 19, 22];
+    const colWidths: any = {};
+    colPercents.forEach((p, i) => {
+      colWidths[i] = { cellWidth: (p / 100) * tableWidth };
     });
+    // ----------------------------------------------
 
-    yPosition += 3;
-    doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 6;
-
-    doc.setFont('helvetica', 'normal').setFontSize(8);
-    selectedClientes.forEach((cliente) => {
-      if (yPosition > doc.internal.pageSize.getHeight() - 15) {
-        doc.addPage();
-        yPosition = margin;
-      }
-
-      const numeroConCheck = cliente.delivered
-        ? `* ${cliente.number?.toString() || ''}`
-        : cliente.number?.toString() || '';
-
-      const rowData = [
-        numeroConCheck,
-        cliente.name || '',
-        cliente.destination || '',
-        cliente.packages?.toString() || '',
-        `+ ${cliente.phone?.toString()}` || '-',
-        cliente.identity_card?.toString() || '-',
-        cliente.family_name || '-',
-        cliente.description || '-',
-      ];
-
-      xPosition = margin;
-      rowData.forEach((data, index) => {
-        const cellWidth = colWidths[index];
-        const cellCenter = xPosition + cellWidth / 2;
-        const textLines: string[] = doc.splitTextToSize(data, cellWidth - 2);
-        textLines.forEach((line: string, i: number) => {
-          doc.text(line, cellCenter, yPosition + i * 3.5, { align: 'center' });
-        });
-        xPosition += cellWidth;
-      });
-
-      yPosition += 8;
+    autoTable(doc, {
+      head: [headers],
+      body,
+      theme: 'grid',
+      styles: {
+        font: 'helvetica',
+        fontSize: 8,
+        halign: 'center',
+        valign: 'middle',
+        textColor: [0, 0, 0],
+        fillColor: [255, 255, 255], // fondo blanco
+        lineWidth: 0.3, // grosor de borde
+        lineColor: [0, 0, 0], // color del borde
+      },
+      columnStyles: {
+        ...colWidths,
+        1: { ...colWidths[1], halign: 'left' },
+        6: { ...colWidths[6], halign: 'left' },
+      },
+      margin: { top: 5, left: margin, right: margin },
+      tableWidth: 'auto',
     });
 
     if (returnDoc) return doc;
@@ -107,6 +99,7 @@ export class ClientesListService {
     const fileName = `clientes_viaje_${viaje?.id || 'sin_viaje'}_${
       new Date().toISOString().split('T')[0]
     }.pdf`;
+
     doc.save(fileName);
   }
 
@@ -170,7 +163,6 @@ export class ClientesListService {
       }
 
       let yPos = currentY + 24;
-      const lineHeight = 14;
 
       doc.setFontSize(14).setFont('helvetica', 'bold');
 
@@ -182,7 +174,7 @@ export class ClientesListService {
       ) => {
         const lines = doc.splitTextToSize(text, maxWidth);
         lines.forEach((line: string, index: number) => {
-          doc.text(line, x, y + index * 4);
+          doc.text(line, x, y + index * 6);
         });
         return lines.length * 4;
       };
@@ -198,9 +190,9 @@ export class ClientesListService {
         yPos,
         maxTextWidth
       );
-      yPos += destinatarioHeight + 10;
+      yPos += destinatarioHeight + 7;
 
-      const telefono = cliente.phone ? `+ ${cliente.phone}` : 'No disponible';
+      const telefono = cliente.phone ? `+${cliente.phone}` : 'No disponible';
       const telefonoText = `Teléfono: ${telefono}`;
       const telefonoHeight = addTextWithWrap(
         telefonoText,
@@ -208,7 +200,7 @@ export class ClientesListService {
         yPos,
         maxTextWidth
       );
-      yPos += telefonoHeight + 10;
+      yPos += telefonoHeight + 7;
 
       const ci = cliente.identity_card
         ? cliente.identity_card.toString()
@@ -220,16 +212,19 @@ export class ClientesListService {
         yPos,
         maxTextWidth
       );
-      yPos += ciHeight + 10;
+      yPos += ciHeight + 7;
 
-      const municipioText = `Municipio: ${cliente.destination}`;
-      const municipioHeight = addTextWithWrap(
-        municipioText,
+      const locationText =
+        cliente.is_address && cliente.address
+          ? `Dirección: ${cliente.address}`
+          : `Municipio: ${cliente.destination}`;
+      const locationHeight = addTextWithWrap(
+        locationText,
         currentX + textMargin,
         yPos,
         maxTextWidth
       );
-      yPos += municipioHeight + 10;
+      yPos += locationHeight + 10;
 
       const enviadoText = `Enviado por: ${cliente.name}`;
       addTextWithWrap(enviadoText, currentX + textMargin, yPos, maxTextWidth);
@@ -278,15 +273,15 @@ export class ClientesListService {
       return;
     }
 
-    const colPercents = [3, 20, 10, 3, 12, 12, 20, 20];
+    const colPercents = [3, 20, 6, 3, 12, 12, 20, 24];
 
     const headers = [
-      '#',
-      'Nombre cliente',
+      ' ',
+      'Nombre Cliente Envía',
       'Destino',
-      'Paq.',
+      'Pqts',
       'Teléfono',
-      'CI',
+      'Carnet de ID',
       'Familiar',
       'Anotaciones',
     ];
@@ -301,7 +296,12 @@ export class ClientesListService {
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
                   children: [
-                    new TextRun({ text: header, bold: true, size: 16 }),
+                    new TextRun({
+                      text: header,
+                      bold: true,
+                      font: 'Arial',
+                      size: 16,
+                    }),
                   ],
                 }),
               ],
@@ -311,19 +311,17 @@ export class ClientesListService {
     ];
 
     selectedClientes.forEach((cliente) => {
-      const numeroConCheck = cliente.delivered
-        ? `* ${cliente.number?.toString() || ''}`
-        : cliente.number?.toString() || '';
-
       const rowData = [
-        numeroConCheck,
-        cliente.name || '',
+        '',
+        ` ${cliente.number?.toString() || ''}. ${cliente.name}` || '',
         cliente.destination || '',
         cliente.packages?.toString() || '',
-        cliente.phone ? `+ ${cliente.phone}` : '-',
-        cliente.identity_card?.toString() || '-',
-        cliente.family_name || '-',
-        cliente.description || '-',
+        cliente.phone ? `+ ${cliente.phone}` : '',
+        cliente.identity_card?.toString() || '',
+        ` ${cliente.family_name}` || '',
+        cliente.address
+          ? `${cliente.address} | ${cliente.description || ''}`
+          : cliente.description || '',
       ];
 
       tableRows.push(
@@ -334,8 +332,13 @@ export class ClientesListService {
                 width: { size: colPercents[i], type: WidthType.PERCENTAGE },
                 children: [
                   new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({ text: data, size: 16 })],
+                    alignment:
+                      i !== 1 && i !== 6
+                        ? AlignmentType.CENTER
+                        : AlignmentType.LEFT,
+                    children: [
+                      new TextRun({ text: data, font: 'Arial', size: 16 }),
+                    ],
                   }),
                 ],
               })
@@ -416,7 +419,10 @@ export class ClientesListService {
       const destinatario = cliente.family_name || cliente.name || '';
       const telefono = cliente.phone ? `+ ${cliente.phone}` : 'No disponible';
       const ci = cliente.identity_card?.toString() || 'No disponible';
-      const municipio = cliente.destination || '';
+      const location =
+        cliente.is_address && cliente.address
+          ? cliente.address
+          : cliente.destination || '';
       const enviado = cliente.name || '';
 
       const children: Paragraph[] = [];
@@ -441,7 +447,9 @@ export class ClientesListService {
         children.push(
           new Paragraph({
             alignment: AlignmentType.LEFT,
-            children: [new TextRun({ text, bold: true, size: 28 })],
+            children: [
+              new TextRun({ text, bold: true, font: 'Arial', size: 28 }),
+            ],
             spacing: { after: 300 },
           })
         );
@@ -450,7 +458,11 @@ export class ClientesListService {
       addLine(`Destinatario: ${destinatario}`);
       addLine(`Teléfono: ${telefono}`);
       addLine(`CI: ${ci}`);
-      addLine(`Municipio: ${municipio}`);
+      addLine(
+        cliente.is_address && cliente.address
+          ? `Dirección: ${location}`
+          : `Municipio: ${location}`
+      );
       addLine(`Enviado por: ${enviado}`);
 
       return new TableCell({

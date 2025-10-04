@@ -179,20 +179,6 @@ export class ClientesList implements OnInit {
     return this.clientes.filter((c) => this.selectedClientes.has(c.id!));
   }
 
-  generateListadoPDF(returnDoc = false) {
-    const selectedClientes = this.getSelectedClientes();
-    return this.pdfService.generateListadoPDF(
-      selectedClientes,
-      this.viaje,
-      returnDoc
-    );
-  }
-
-  printListadoPDF() {
-    const selectedClientes = this.getSelectedClientes();
-    this.pdfService.printListadoPDF(selectedClientes, this.viaje);
-  }
-
   toggleListadoMenu() {
     this.showListadoMenu = !this.showListadoMenu;
     this.showEtiquetasMenu = false;
@@ -206,6 +192,20 @@ export class ClientesList implements OnInit {
   closeMenus() {
     this.showListadoMenu = false;
     this.showEtiquetasMenu = false;
+  }
+
+  generateListadoPDF(returnDoc = false) {
+    const selectedClientes = this.getSelectedClientes();
+    return this.pdfService.generateListadoPDF(
+      selectedClientes,
+      this.viaje,
+      returnDoc
+    );
+  }
+
+  printListadoPDF() {
+    const selectedClientes = this.getSelectedClientes();
+    this.pdfService.printListadoPDF(selectedClientes, this.viaje);
   }
 
   generateEtiquetasPDF(returnDoc = false) {
@@ -230,5 +230,19 @@ export class ClientesList implements OnInit {
   generateEtiquetasWord() {
     const selectedClientes = this.getSelectedClientes();
     return this.pdfService.generateEtiquetasWord(selectedClientes, this.viaje);
+  }
+
+  async toggleAddressStatus(cliente: Cliente) {
+    if (!cliente.address) return; // Solo si tiene dirección
+
+    try {
+      await this.clientesService.updateCliente(cliente.id!, {
+        is_address: !cliente.is_address,
+      });
+      cliente.is_address = !cliente.is_address;
+    } catch (error) {
+      this.error = 'Error al actualizar el estado de dirección';
+      console.error(error);
+    }
   }
 }
