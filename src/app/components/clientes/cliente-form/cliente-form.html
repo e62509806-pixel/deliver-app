@@ -89,10 +89,9 @@
                       <thead class="table-light">
                         <tr>
                           <th>Nombre</th>
-                          <th>Familiar</th>
                           <th>Cédula</th>
                           <th>Teléfono</th>
-                          <th>Destino</th>
+                          <th>Provincia</th>
                           <th>Acción</th>
                         </tr>
                       </thead>
@@ -100,7 +99,6 @@
                         @for (cliente of searchResults; track cliente.id) {
                         <tr>
                           <td>{{ cliente.name }}</td>
-                          <td>{{ cliente.family_name || "-" }}</td>
                           <td>{{ cliente.identity_card || "-" }}</td>
                           <td>{{ cliente.phone || "-" }}</td>
                           <td>{{ cliente.destination }}</td>
@@ -194,15 +192,19 @@
 
                 <div class="mb-3">
                   <label for="destination" class="form-label">Destino *</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="destination"
-                    name="destination"
+                  <ng-select
+                    [items]="getProvincias()"
+                    bindLabel="name"
+                    bindValue="code"
+                    placeholder="Selecciona una provincia"
                     [(ngModel)]="cliente.destination"
+                    name="destination"
                     required
                     [disabled]="loading"
-                  />
+                    searchable="true"
+                    class="form-control bootstrap-select"
+                  >
+                  </ng-select>
                 </div>
               </div>
 

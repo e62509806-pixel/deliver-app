@@ -8,8 +8,7 @@
           @if (viaje) {
           <p class="text-muted mb-0">
             Viaje #{{ viaje.id }} - {{ viaje.date | date : "dd/MM/yyyy" }} @if
-            (viaje.description) { - {{ viaje.description }}
-            }
+            (viaje.description) { - {{ viaje.description }} }
           </p>
           }
         </div>
@@ -19,8 +18,6 @@
           </button>
         </div>
       </div>
-
-      <!-- Las estadísticas se han movido a las tarjetas de viaje -->
 
       <!-- Menús desplegables para PDF e impresión -->
       @if (clientes.length > 0) {
@@ -106,6 +103,7 @@
                 </button>
               </div>
             </div>
+
             <!-- Botón Marcar como entregados -->
             <button
               class="btn"
@@ -119,6 +117,7 @@
               <i class="fas fa-check"></i> Entregados } @else {
               <i class="fas fa-clock"></i> Pendientes }
             </button>
+
             <!-- Botón Nuevo Cliente -->
             <button class="btn btn-primary" (click)="addCliente()">
               <i class="fas fa-plus"></i> Nuevo Cliente
@@ -172,7 +171,6 @@
               <th>Teléfono</th>
               <th>Carnet de ID</th>
               <th>Familiar</th>
-              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -202,7 +200,7 @@
                   data-bs-toggle="tooltip"
                   data-bs-placement="top"
                 >
-                  {{ cliente.is_address ? "Mostrar" : "Ocultar" }}
+                  {{ cliente.is_address ? "SI" : "NO" }}
                 </button>
                 } @else {
                 <span class="text-muted">-</span>
@@ -215,19 +213,21 @@
               <td>{{ cliente.identity_card || "-" }}</td>
               <td>{{ cliente.family_name || "-" }}</td>
               <td>
-                <button
-                  class="btn btn-sm"
-                  [class.btn-success]="cliente.delivered"
-                  [class.btn-outline-success]="!cliente.delivered"
-                  (click)="toggleDelivered(cliente)"
-                >
-                  @if (cliente.delivered) {
-                  <i class="fas fa-check"></i> Entregado } @else {
-                  <i class="fas fa-clock"></i> Pendiente }
-                </button>
-              </td>
-              <td>
                 <div class="btn-group" role="group">
+                  <!-- Botón de estado sin texto -->
+                  <button
+                    class="btn btn-sm"
+                    [class.btn-success]="cliente.delivered"
+                    [class.btn-outline-success]="!cliente.delivered"
+                    (click)="toggleDelivered(cliente)"
+                    [title]="cliente.delivered ? 'Entregado' : 'Pendiente'"
+                  >
+                    <i
+                      class="fas"
+                      [ngClass]="cliente.delivered ? 'fa-check' : 'fa-clock'"
+                    ></i>
+                  </button>
+
                   <button
                     class="btn btn-outline-primary btn-sm"
                     (click)="editCliente(cliente.id!)"

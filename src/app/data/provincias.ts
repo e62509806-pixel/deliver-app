@@ -1,0 +1,18 @@
+export const provincias = [
+  { name: 'Pinar del Río', code: 'PR' },
+  { name: 'Artemisa', code: 'ART' },
+  { name: 'La Habana', code: 'HB' },
+  { name: 'Mayabeque', code: 'MY' },
+  { name: 'Matanzas', code: 'MTZ' },
+  { name: 'Cienfuegos', code: 'CFG' },
+  { name: 'Villa Clara', code: 'VC' },
+  { name: 'Sancti Spíritus', code: 'SSP' },
+  { name: 'Ciego de Ávila', code: 'CAV' },
+  { name: 'Camagüey', code: 'CMG' },
+  { name: 'Las Tunas', code: 'LT' },
+  { name: 'Holguín', code: 'HG' },
+  { name: 'Granma', code: 'GRM' },
+  { name: 'Santiago de Cuba', code: 'STG' },
+  { name: 'Guantánamo', code: 'GTM' },
+  { name: 'Isla de la Juventud', code: 'IJ' },
+];

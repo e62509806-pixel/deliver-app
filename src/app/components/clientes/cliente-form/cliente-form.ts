@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { ClientesService } from '../../../services/clientes.service';
 import { ViajesService } from '../../../services/viajes.service';
 import {
@@ -10,10 +11,11 @@ import {
   ClienteUpdate,
 } from '../../../models/cliente.model';
 import { Viaje } from '../../../models/viaje.model';
+import { provincias } from '../../../data/provincias';
 
 @Component({
   selector: 'app-cliente-form',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgSelectModule],
   templateUrl: './cliente-form.html',
   styleUrl: './cliente-form.css',
 })
@@ -64,6 +66,10 @@ export class ClienteForm implements OnInit {
         this.loadViaje();
       }
     });
+  }
+
+  getProvincias() {
+    return provincias;
   }
 
   async loadViaje() {

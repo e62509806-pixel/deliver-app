@@ -388,6 +388,7 @@ export class ClientesListService {
       return;
     }
 
+    // Cargar logo
     let logoData: Uint8Array | undefined;
     try {
       const res = await fetch('/logo.png');
@@ -402,19 +403,8 @@ export class ClientesListService {
     const tableRows: TableRow[] = [];
 
     const makeCell = (cliente?: Cliente) => {
-      if (!cliente) {
-        return new TableCell({
-          children: [new Paragraph({ text: '' })],
-          width: { size: 50, type: WidthType.PERCENTAGE },
-          borders: {
-            top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
-            bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
-            left: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
-            right: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
-          },
-          margins: { top: 50, bottom: 100, left: 250, right: 250 },
-        });
-      }
+      if (!cliente)
+        return new TableCell({ children: [new Paragraph({ text: '' })] });
 
       const destinatario = cliente.family_name || cliente.name || '';
       const telefono = cliente.phone ? `+ ${cliente.phone}` : 'No disponible';
@@ -438,36 +428,53 @@ export class ClientesListService {
                 transformation: { width: 60, height: 60 },
               }),
             ],
-            spacing: { after: 100 },
+            spacing: { after: 150 },
           })
         );
       }
 
-      const addLine = (text: string) => {
-        children.push(
-          new Paragraph({
-            alignment: AlignmentType.LEFT,
-            children: [
-              new TextRun({ text, bold: true, font: 'Arial', size: 28 }),
-            ],
-            spacing: { after: 300 },
-          })
-        );
+      const addWrappedLine = (
+        text: string,
+        maxChars = 40,
+        isLastLineOfBlock = true
+      ) => {
+        const regex = new RegExp(`(.{1,${maxChars}})(\\s|$)`, 'g');
+        const lines = text.match(regex) || [text];
+
+        lines.forEach((line, index) => {
+          children.push(
+            new Paragraph({
+              alignment: AlignmentType.LEFT,
+              children: [
+                new TextRun({
+                  text: line,
+                  font: 'Arial',
+                  size: 28,
+                  bold: true,
+                }),
+              ],
+              spacing: {
+                after:
+                  index === lines.length - 1 && isLastLineOfBlock ? 300 : 200,
+              },
+            })
+          );
+        });
       };
 
-      addLine(`Destinatario: ${destinatario}`);
-      addLine(`Teléfono: ${telefono}`);
-      addLine(`CI: ${ci}`);
-      addLine(
+      addWrappedLine(`Destinatario: ${destinatario}`);
+      addWrappedLine(`Teléfono: ${telefono}`);
+      addWrappedLine(`CI: ${ci}`);
+      addWrappedLine(
         cliente.is_address && cliente.address
           ? `Dirección: ${location}`
           : `Municipio: ${location}`
       );
-      addLine(`Enviado por: ${enviado}`);
+      addWrappedLine(`Enviado por: ${enviado}`);
 
       return new TableCell({
         children,
-        margins: { top: 500, bottom: 500, left: 250, right: 250 },
+        margins: { top: 200, bottom: 200, left: 100, right: 100 },
         borders: {
           top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
           bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
@@ -496,7 +503,7 @@ export class ClientesListService {
         {
           properties: {
             page: {
-              margin: { top: 200, bottom: 200, left: 200, right: 200 },
+              margin: { top: 400, bottom: 200, left: 200, right: 200 },
             },
           },
           children: [table],
