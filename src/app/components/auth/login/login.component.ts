@@ -38,4 +38,8 @@ export class LoginComponent {
       this.isLoading = false;
     }
   }
+
+  resetErrorMessage() {
+    this.errorMessage = '';
+  }
 }
