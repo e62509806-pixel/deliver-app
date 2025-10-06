@@ -2,9 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClientesService } from '../../services/clientes.service';
-import { ViajesService } from '../../services/viajes.service';
 import { Cliente } from '../../models/cliente.model';
-import { Viaje } from '../../models/viaje.model';
 
 @Component({
   selector: 'app-home',
@@ -19,15 +17,13 @@ export class HomeComponent {
   isLoading = false;
   errorMessage = '';
 
-  constructor(
-    private clientesService: ClientesService,
-    private viajesService: ViajesService
-  ) {}
+  constructor(private clientesService: ClientesService) {}
 
   async searchPackages() {
-    if (!this.searchName.trim() && !this.searchIdentity.trim()) {
+    // Validar que ambos campos estén llenos
+    if (!this.searchName.trim() || !this.searchIdentity.trim()) {
       this.errorMessage =
-        'Por favor, ingrese al menos el nombre o el carnet de identidad';
+        'Por favor, ingrese el nombre y el carnet de identidad.';
       return;
     }
 
@@ -38,21 +34,12 @@ export class HomeComponent {
     try {
       let results: Cliente[] = [];
 
-      // Buscar por nombre si está proporcionado
-      if (this.searchName.trim()) {
-        const nameResults = await this.clientesService.searchClientesByName(
-          this.searchName.trim()
+      // Buscar por nombre y carnet de identidad
+      if (this.searchName.trim() && this.searchIdentity.trim()) {
+        results = await this.clientesService.searchClientesByNameByIdentity(
+          this.searchName.trim(),
+          this.searchIdentity.trim()
         );
-        results = [...results, ...nameResults];
-      }
-
-      // Buscar por carnet si está proporcionado
-      if (this.searchIdentity.trim()) {
-        const identityResults =
-          await this.clientesService.searchClientesByIdentity(
-            this.searchIdentity.trim()
-          );
-        results = [...results, ...identityResults];
       }
 
       // Eliminar duplicados basándose en el ID
@@ -62,6 +49,10 @@ export class HomeComponent {
       );
 
       this.searchResults = uniqueResults;
+
+      if (this.searchResults.length === 0) {
+        this.errorMessage = 'No se encontraron coincidencias exactas.';
+      }
     } catch (error) {
       this.errorMessage = 'Error al buscar paquetes. Intente nuevamente.';
       console.error('Error searching packages:', error);
@@ -70,11 +61,21 @@ export class HomeComponent {
     }
   }
 
+  clearSearch() {
+    this.searchName = '';
+    this.searchIdentity = '';
+    this.searchResults = [];
+  }
+
   getStatusText(delivered: boolean): string {
     return delivered ? 'Entregado' : 'Pendiente';
   }
 
   getStatusClass(delivered: boolean): string {
     return delivered ? 'text-success' : 'text-warning';
+  }
+
+  resetErrorMessage() {
+    this.errorMessage = '';
   }
 }
