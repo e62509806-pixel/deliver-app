@@ -209,7 +209,7 @@
               <td>
                 <span class="badge bg-primary">{{ cliente.packages }}</span>
               </td>
-              <td>+ {{ cliente.phone || "-" }}</td>
+              <td>{{ "+" + cliente.phone || "-" }}</td>
               <td>{{ cliente.identity_card || "-" }}</td>
               <td>{{ cliente.family_name || "-" }}</td>
               <td>
