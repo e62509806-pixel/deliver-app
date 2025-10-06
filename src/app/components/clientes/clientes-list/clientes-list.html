@@ -107,13 +107,13 @@
             <!-- Botón Marcar como entregados -->
             <button
               class="btn"
-              [class.btn-success]="!selectedAsDelivered"
-              [class.btn-outline-success]="selectedAsDelivered"
+              [class.btn-success]="!selectedAsDelivered()"
+              [class.btn-outline-success]="selectedAsDelivered()"
               (click)="markSelectedAsDelivered()"
               [disabled]="selectedClientes.size === 0"
               title="Marcar seleccionados como entregados"
             >
-              @if (!selectedAsDelivered) {
+              @if (!selectedAsDelivered()) {
               <i class="fas fa-check"></i> Entregados } @else {
               <i class="fas fa-clock"></i> Pendientes }
             </button>
@@ -209,7 +209,7 @@
               <td>
                 <span class="badge bg-primary">{{ cliente.packages }}</span>
               </td>
-              <td>{{ "+" + cliente.phone || "-" }}</td>
+              <td>{{ cliente.phone ? "+" + cliente.phone : "-" }}</td>
               <td>{{ cliente.identity_card || "-" }}</td>
               <td>{{ cliente.family_name || "-" }}</td>
               <td>

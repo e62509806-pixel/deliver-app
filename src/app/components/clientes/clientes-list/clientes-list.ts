@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,7 +30,7 @@ export class ClientesList implements OnInit {
   showListadoMenu = false;
   showEtiquetasMenu = false;
 
-  selectedAsDelivered: boolean = false;
+  selectedAsDelivered = signal<boolean>(false);
 
   constructor(
     private clientesService: ClientesService,
@@ -68,6 +68,12 @@ export class ClientesList implements OnInit {
       this.clientes = await this.clientesService.getClientesByViaje(
         this.viajeId
       );
+      if (this.clientes.length > 0) {
+        const allDelivered = this.clientes.every((c) => c.delivered);
+        this.selectedAsDelivered.set(allDelivered);
+      } else {
+        this.selectedAsDelivered.set(true);
+      }
     } catch (error) {
       this.error = 'Error al cargar los clientes';
       console.error(error);
@@ -103,7 +109,9 @@ export class ClientesList implements OnInit {
 
   async markSelectedAsDelivered() {
     if (this.selectedClientes.size === 0) return;
-    this.selectedAsDelivered = !this.selectedAsDelivered;
+    this.selectedAsDelivered.update(
+      (selectedAsDelivered) => !selectedAsDelivered
+    );
     try {
       const promises = [];
       for (const cliente of this.clientes) {
@@ -111,10 +119,10 @@ export class ClientesList implements OnInit {
           promises.push(
             this.clientesService.toggleDelivered(
               cliente.id!,
-              this.selectedAsDelivered
+              this.selectedAsDelivered()
             )
           );
-          cliente.delivered = this.selectedAsDelivered;
+          cliente.delivered = this.selectedAsDelivered();
         }
       }
 
