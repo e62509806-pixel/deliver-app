@@ -43,7 +43,7 @@
                 <div class="col-6">
                   <p class="card-text">
                     <strong>Fecha:</strong>
-                    {{ formatDate(viaje.date) }}
+                    {{ viaje.date | date : "dd/MM/yyyy" }}
                   </p>
                   <p class="card-text">
                     @if (viaje.description) {
