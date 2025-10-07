@@ -8,7 +8,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   {
     path: 'viajes',
@@ -40,5 +40,5 @@ export const routes: Routes = [
     component: ClienteForm,
     canActivate: [AuthGuard],
   },
-  { path: '**', redirectTo: '/' },
+  { path: '**', redirectTo: 'home' },
 ];
