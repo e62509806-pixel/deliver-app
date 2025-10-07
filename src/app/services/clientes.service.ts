@@ -105,7 +105,7 @@ export class ClientesService {
     const { data, error } = await this.supabase.client
       .from('clientes')
       .select('*')
-      .ilike('name', searchTerm)
+      .ilike('name', `%${searchTerm}%`)
       .order('name', { ascending: true })
       .limit(20);
 
