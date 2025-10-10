@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,6 +31,11 @@ export class ClientesList implements OnInit {
   showEtiquetasMenu = false;
 
   selectedAsDelivered = signal<boolean>(false);
+
+  // Edición inline del campo check
+  editingCheck: number | null = null;
+  tempCheckValue: string = '';
+  @ViewChild('checkInput') checkInput!: ElementRef;
 
   constructor(
     private clientesService: ClientesService,
@@ -252,5 +257,51 @@ export class ClientesList implements OnInit {
       this.error = 'Error al actualizar el estado de dirección';
       console.error(error);
     }
+  }
+
+  // Métodos para edición inline del campo check
+  startEditCheck(cliente: Cliente) {
+    this.editingCheck = cliente.id!;
+    this.tempCheckValue = cliente.check || '';
+    
+    // Enfocar el input después de que se renderice
+    setTimeout(() => {
+      if (this.checkInput) {
+        this.checkInput.nativeElement.focus();
+        this.checkInput.nativeElement.select();
+      }
+    }, 0);
+  }
+
+  async saveCheckValue(cliente: Cliente) {
+    if (this.editingCheck !== cliente.id) return;
+
+    // Validar que sea una sola letra
+    const trimmedValue = this.tempCheckValue.trim().toUpperCase();
+    
+    // Solo permitir una letra (A-Z)
+    if (trimmedValue.length > 1 || (trimmedValue.length === 1 && !/^[A-Z]$/.test(trimmedValue))) {
+      this.cancelEditCheck();
+      return;
+    }
+
+    const newValue = trimmedValue || null;
+
+    try {
+      await this.clientesService.updateCliente(cliente.id!, {
+        check: newValue,
+      });
+      cliente.check = newValue;
+      this.cancelEditCheck();
+    } catch (error) {
+      this.error = 'Error al actualizar el campo check';
+      console.error(error);
+      this.cancelEditCheck();
+    }
+  }
+
+  cancelEditCheck() {
+    this.editingCheck = null;
+    this.tempCheckValue = '';
   }
 }

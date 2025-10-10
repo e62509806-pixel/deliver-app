@@ -1,0 +1,26 @@
+/* Estilos para el campo check editable */
+.check-editable {
+  cursor: pointer;
+  min-width: 20px;
+  display: inline-block;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.check-editable:hover {
+  background-color: #f8f9fa;
+}
+
+.check-input {
+  width: 40px !important;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #80bdff;
+}

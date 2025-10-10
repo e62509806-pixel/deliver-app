@@ -163,7 +163,8 @@
                   title="Seleccionar todos"
                 />
               </th>
-              <th>#</th>
+              <th>&nbsp;</th>
+              <th>N°</th>
               <th>Nombre Cliente</th>
               <th>Destino</th>
               <th>Dirección</th>
@@ -185,6 +186,32 @@
                   (change)="toggleClienteSelection(cliente.id!)"
                   title="Seleccionar cliente"
                 />
+              </td>
+              <td>
+                @if (editingCheck === cliente.id) {
+                <input
+                  type="text"
+                  class="form-control form-control-sm check-input"
+                  [(ngModel)]="tempCheckValue"
+                  (keydown.enter)="saveCheckValue(cliente)"
+                  (keydown.escape)="cancelEditCheck()"
+                  (blur)="saveCheckValue(cliente)"
+                  maxlength="1"
+                  #checkInput
+                />
+                } @else {
+                <span
+                  (click)="startEditCheck(cliente)"
+                  class="check-editable"
+                  title="Click para editar"
+                >
+                  @if (cliente.check) { 
+                    {{ cliente.check }} 
+                  } @else { 
+                    <i class="fas fa-pencil"></i> 
+                  }
+                </span>
+                }
               </td>
               <td>{{ cliente.number }}</td>
               <td>{{ cliente.name }}</td>

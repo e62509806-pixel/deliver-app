@@ -48,7 +48,7 @@ export class ClientesListService {
     ];
 
     const body = selectedClientes.map((cliente) => [
-      '',
+      cliente.check || '',
       ` ${cliente.number?.toString() || ''}. ${cliente.name}` || '',
       cliente.destination || '',
       cliente.packages?.toString() || '',
@@ -312,7 +312,7 @@ export class ClientesListService {
 
     selectedClientes.forEach((cliente) => {
       const rowData = [
-        '',
+        cliente.check || '',
         ` ${cliente.number?.toString() || ''}. ${cliente.name}` || '',
         cliente.destination || '',
         cliente.packages?.toString() || '',

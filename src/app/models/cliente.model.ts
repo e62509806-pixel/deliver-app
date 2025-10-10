@@ -1,5 +1,6 @@
 export interface Cliente {
   id?: number;
+  check?: string | null;
   number: number;
   name: string;
   identity_card?: number | null;
@@ -30,6 +31,7 @@ export interface ClienteCreate {
 }
 
 export interface ClienteUpdate {
+  check?: string | null;
   number?: number;
   name?: string;
   identity_card?: number | null;
