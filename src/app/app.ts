@@ -1,4 +1,5 @@
 import { Component, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
@@ -14,7 +15,7 @@ export class App {
   isMenuOpen = false;
   isUserMenuOpen = false;
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, private router: Router) {}
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
@@ -43,11 +44,8 @@ export class App {
   }
 
   async logout() {
-    try {
-      await this.authService.signOut();
-      this.closeUserMenu();
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
+    await this.authService.signOut();
+    await this.router.navigate(['/login']);
+    this.closeUserMenu();
   }
 }

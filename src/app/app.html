@@ -73,7 +73,8 @@
               <a
                 class="dropdown-item"
                 href="#"
-                (click)="logout(); closeUserMenu()"
+                (click)="$event.preventDefault(); logout()"
+                routerLink="/login"
               >
                 <i class="fas fa-sign-out-alt me-2"></i>
                 Cerrar Sesión

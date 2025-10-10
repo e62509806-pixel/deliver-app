@@ -8,14 +8,13 @@ import { User } from '@supabase/supabase-js';
 export class AuthService {
   private currentUser = signal<User | null>(null);
   private isAuthenticated = signal<boolean>(false);
+  private readonly SUPABASE_KEY = 'sb-dzeawanrkskzsorkyrxi-auth-token';
 
   constructor(private supabase: SupabaseService) {
-    // Initialize auth state
     this.initializeAuth();
   }
 
   private async initializeAuth() {
-    // Get initial session
     const {
       data: { session },
     } = await this.supabase.client.auth.getSession();
@@ -23,16 +22,17 @@ export class AuthService {
     if (session?.user) {
       this.currentUser.set(session.user);
       this.isAuthenticated.set(true);
+    } else {
+      this.currentUser.set(null);
+      this.isAuthenticated.set(false);
     }
 
-    // Listen for auth changes
     this.supabase.client.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
+      if (event === 'SIGNED_OUT') {
+        this.resetAuth();
+      } else if (session?.user) {
         this.currentUser.set(session.user);
         this.isAuthenticated.set(true);
-      } else {
-        this.currentUser.set(null);
-        this.isAuthenticated.set(false);
       }
     });
   }
@@ -42,22 +42,11 @@ export class AuthService {
       email,
       password,
     });
+    if (error) throw error;
 
-    if (error) {
-      throw error;
-    }
-
-    return data;
-  }
-
-  async signUp(email: string, password: string) {
-    const { data, error } = await this.supabase.client.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw error;
+    if (data.user) {
+      this.currentUser.set(data.user);
+      this.isAuthenticated.set(true);
     }
 
     return data;
@@ -65,53 +54,38 @@ export class AuthService {
 
   async signOut() {
     try {
-      const { error } = await this.supabase.client.auth.signOut();
-
-      if (error) {
-        // Si la sesión no existe en el backend, aún así limpiamos localmente
-        if (
-          (error as any)?.message
-            ?.toLowerCase?.()
-            .includes('session_not_found') ||
-          (error as any)?.name === 'AuthSessionMissingError' ||
-          (error as any)?.status === 401
-        ) {
-          this.forceClearSession();
-          return;
-        }
-
-        // Para cualquier otro error, aseguramos limpieza local y propagamos
-        this.forceClearSession();
-        throw error;
-      }
+      //await this.supabase.client.auth.signOut();
     } catch (e) {
-      // Si hubo cualquier excepción inesperada, limpiamos localmente y re-lanzamos
-      this.forceClearSession();
-      throw e;
-    } finally {
-      // Aseguramos que el estado reactivo refleje cierre de sesión
-      this.currentUser.set(null);
-      this.isAuthenticated.set(false);
+      console.warn('Supabase signOut error:', e);
     }
+
+    // 🔥 Espera un pequeño delay y limpia manualmente
+    setTimeout(() => {
+      this.forceClearSupabaseSession();
+    }, 300);
+
+    this.resetAuth();
   }
 
-  private forceClearSession() {
+  private resetAuth() {
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
+  }
+
+  // 🔥 Limpieza forzada de la sesión local
+  private forceClearSupabaseSession() {
     try {
-      // Limpiar posibles claves de Supabase en localStorage (sb-<ref>-auth-token)
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (!key) continue;
+      localStorage.removeItem(this.SUPABASE_KEY);
+      sessionStorage.removeItem(this.SUPABASE_KEY);
+
+      // Algunos navegadores mantienen copia en locks de Supabase
+      Object.keys(localStorage).forEach((key) => {
         if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
-          keysToRemove.push(key);
+          localStorage.removeItem(key);
         }
-        if (key.toLowerCase() === 'supabase.auth.token') {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach((k) => localStorage.removeItem(k));
-    } catch {
-      // ignorar errores de acceso a storage (modo privado, etc.)
+      });
+    } catch (e) {
+      console.error('Error clearing Supabase local session:', e);
     }
   }
 
