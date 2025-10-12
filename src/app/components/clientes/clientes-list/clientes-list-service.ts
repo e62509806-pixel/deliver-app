@@ -133,7 +133,7 @@ export class ClientesListService {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 5;
+    const margin = 10;
     const labelWidth = (pageWidth - margin * 2) / 2;
     const labelHeight = 90;
     const labelSpacing = 0;
@@ -455,7 +455,7 @@ export class ClientesListService {
               ],
               spacing: {
                 after:
-                  index === lines.length - 1 && isLastLineOfBlock ? 300 : 200,
+                  index === lines.length - 1 && isLastLineOfBlock ? 350 : 200,
               },
             })
           );
@@ -474,7 +474,7 @@ export class ClientesListService {
 
       return new TableCell({
         children,
-        margins: { top: 200, bottom: 200, left: 100, right: 100 },
+        margins: { top: 200, bottom: 300, left: 200, right: 200 },
         borders: {
           top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
           bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
@@ -503,7 +503,7 @@ export class ClientesListService {
         {
           properties: {
             page: {
-              margin: { top: 400, bottom: 200, left: 200, right: 200 },
+              margin: { top: 450, bottom: 200, left: 450, right: 450 },
             },
           },
           children: [table],
