@@ -1,69 +1,40 @@
 import { Injectable, signal } from '@angular/core';
-import { SupabaseService } from './supabase.service';
-import { User } from '@supabase/supabase-js';
+import { AuthApiService, AuthSession, AuthUser } from './auth-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private currentUser = signal<User | null>(null);
+  private currentUser = signal<AuthUser | null>(null);
   private isAuthenticated = signal<boolean>(false);
   private readonly SUPABASE_KEY = 'sb-dzeawanrkskzsorkyrxi-auth-token';
 
-  constructor(private supabase: SupabaseService) {
+  constructor(private authApi: AuthApiService) {
     this.initializeAuth();
   }
 
   private async initializeAuth() {
-    const {
-      data: { session },
-    } = await this.supabase.client.auth.getSession();
-
+    const session = await this.authApi.getSession();
     if (session?.user) {
       this.currentUser.set(session.user);
       this.isAuthenticated.set(true);
-    } else {
-      this.currentUser.set(null);
-      this.isAuthenticated.set(false);
+      return;
     }
-
-    this.supabase.client.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        this.resetAuth();
-      } else if (session?.user) {
-        this.currentUser.set(session.user);
-        this.isAuthenticated.set(true);
-      }
-    });
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
   }
 
   async signIn(email: string, password: string) {
-    const { data, error } = await this.supabase.client.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-
-    if (data.user) {
-      this.currentUser.set(data.user);
+    const session: AuthSession = await this.authApi.signIn(email, password);
+    if (session.user) {
+      this.currentUser.set(session.user);
       this.isAuthenticated.set(true);
     }
-
-    return data;
+    return session;
   }
 
   async signOut() {
-    try {
-      //await this.supabase.client.auth.signOut();
-    } catch (e) {
-      console.warn('Supabase signOut error:', e);
-    }
-
-    // 🔥 Espera un pequeño delay y limpia manualmente
-    setTimeout(() => {
-      this.forceClearSupabaseSession();
-    }, 300);
-
+    await this.authApi.signOut();
     this.resetAuth();
   }
 
@@ -98,9 +69,6 @@ export class AuthService {
   }
 
   async getSession() {
-    const {
-      data: { session },
-    } = await this.supabase.client.auth.getSession();
-    return session;
+    return await this.authApi.getSession();
   }
 }

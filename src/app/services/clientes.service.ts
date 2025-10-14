@@ -1,135 +1,69 @@
 import { Injectable } from '@angular/core';
-import { SupabaseService } from './supabase.service';
+import { ApiService } from './api.service';
 import { Cliente, ClienteCreate, ClienteUpdate } from '../models/cliente.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ClientesService {
-  constructor(private supabase: SupabaseService) {}
+  constructor(private api: ApiService) {}
 
   async getClientesByViaje(viajeId: number): Promise<Cliente[]> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .select('*')
-      .eq('viaje_id', viajeId)
-      .order('number', { ascending: true });
-
-    if (error) {
-      throw error;
-    }
-    return data || [];
+    return await this.api.getList<Cliente>('clientes', {
+      filters: { viaje_id: viajeId },
+      orderBy: { column: 'number', ascending: true },
+    });
   }
 
   async getAllClientes(): Promise<Cliente[]> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .select('*')
-      .order('viaje_id', { ascending: false })
-      .order('number', { ascending: true });
-
-    if (error) {
-      throw error;
-    }
-    return data || [];
+    return await this.api.getList<Cliente>('clientes', {
+      orderBy: [
+        { column: 'viaje_id', ascending: false },
+        { column: 'number', ascending: true },
+      ],
+    });
   }
 
   async getCliente(id: number): Promise<Cliente | null> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-    return data;
+    return await this.api.getSingle<Cliente>('clientes', {
+      filters: { id },
+      single: true,
+    });
   }
 
   async createCliente(cliente: ClienteCreate): Promise<Cliente> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .insert([cliente])
-      .select()
-      .single();
-
-    if (error) {
-      throw error;
-    }
-    return data;
+    return await this.api.insert<Cliente>('clientes', [cliente]);
   }
 
   async updateCliente(id: number, cliente: ClienteUpdate): Promise<Cliente> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .update(cliente)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      throw error;
-    }
-    return data;
+    return await this.api.update<Cliente>('clientes', { id }, cliente);
   }
 
   async deleteCliente(id: number): Promise<void> {
-    const { error } = await this.supabase.client
-      .from('clientes')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      throw error;
-    }
+    await this.api.delete('clientes', { id });
   }
 
   async toggleDelivered(id: number, delivered: boolean): Promise<Cliente> {
-    console.log(delivered);
-
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .update({ delivered })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      throw error;
-    }
-    return data;
+    return await this.api.update<Cliente>('clientes', { id }, { delivered });
   }
 
   async searchClientesByName(searchTerm: string): Promise<Cliente[]> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .select('*')
-      .ilike('name', `%${searchTerm}%`)
-      .order('name', { ascending: true })
-      .limit(20);
-
-    if (error) {
-      throw error;
-    }
-    return data || [];
+    return await this.api.getList<Cliente>('clientes', {
+      ilike: { name: searchTerm },
+      orderBy: { column: 'name', ascending: true },
+      limit: 20,
+    });
   }
 
   async searchClientesByNameByIdentity(
     name: string,
     identityCard: string
   ): Promise<Cliente[]> {
-    const { data, error } = await this.supabase.client
-      .from('clientes')
-      .select('*')
-      .ilike('name', name)
-      .eq('identity_card', identityCard)
-      .order('name', { ascending: true })
-      .limit(20);
-
-    if (error) {
-      throw error;
-    }
-    return data || [];
+    return await this.api.getList<Cliente>('clientes', {
+      ilike: { name },
+      filters: { identity_card: identityCard },
+      orderBy: { column: 'name', ascending: true },
+      limit: 20,
+    });
   }
 }
