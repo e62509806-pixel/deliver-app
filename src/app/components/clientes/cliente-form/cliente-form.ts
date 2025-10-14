@@ -23,7 +23,7 @@ export class ClienteForm implements OnInit {
   cliente: ClienteCreate = {
     number: 0,
     name: '',
-    identity_card: null,
+    identity_card: '',
     destination: '',
     packages: 1,
     family_name: '',
@@ -94,7 +94,7 @@ export class ClienteForm implements OnInit {
         this.cliente = {
           number: cliente.number,
           name: cliente.name,
-          identity_card: cliente.identity_card || null,
+          identity_card: cliente.identity_card,
           destination: cliente.destination,
           packages: cliente.packages,
           family_name: cliente.family_name || '',
@@ -121,13 +121,13 @@ export class ClienteForm implements OnInit {
 
     this.loading = true;
     this.error = null;
-
+    console.log(this.cliente)
     try {
       if (this.isEdit && this.clienteId) {
         const updateData: ClienteUpdate = {
           number: this.cliente.number,
           name: this.cliente.name,
-          identity_card: this.cliente.identity_card || null,
+          identity_card: this.cliente.identity_card,
           destination: this.cliente.destination,
           packages: this.cliente.packages,
           family_name: this.cliente.family_name || undefined,

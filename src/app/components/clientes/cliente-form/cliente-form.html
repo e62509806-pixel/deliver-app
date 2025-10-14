@@ -285,10 +285,12 @@
                     >Carnet de ID</label
                   >
                   <input
-                    type="number"
+                    type="text"
                     class="form-control"
                     id="identity_card"
                     name="identity_card"
+                    maxlength="11"
+                    minlength="11"
                     [(ngModel)]="cliente.identity_card"
                     [disabled]="loading"
                   />

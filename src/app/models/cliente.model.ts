@@ -3,7 +3,7 @@ export interface Cliente {
   check?: string | null;
   number: number;
   name: string;
-  identity_card?: number | null;
+  identity_card?: string;
   destination: string;
   packages: number;
   family_name?: string;
@@ -18,7 +18,7 @@ export interface Cliente {
 export interface ClienteCreate {
   number: number;
   name: string;
-  identity_card?: number | null;
+  identity_card?: string;
   destination: string;
   packages: number;
   family_name?: string;
@@ -34,7 +34,7 @@ export interface ClienteUpdate {
   check?: string | null;
   number?: number;
   name?: string;
-  identity_card?: number | null;
+  identity_card?: string;
   destination?: string;
   packages?: number;
   family_name?: string;
