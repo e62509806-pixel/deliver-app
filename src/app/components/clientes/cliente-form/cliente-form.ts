@@ -11,7 +11,7 @@ import {
   ClienteUpdate,
 } from '../../../models/cliente.model';
 import { Viaje } from '../../../models/viaje.model';
-import { provincias } from '../../../data/provincias';
+//import { provincias } from '../../../data/provincias';
 
 @Component({
   selector: 'app-cliente-form',
@@ -68,9 +68,9 @@ export class ClienteForm implements OnInit {
     });
   }
 
-  getProvincias() {
+  /* getProvincias() {
     return provincias;
-  }
+  } */
 
   async loadViaje() {
     if (!this.viajeId) return;

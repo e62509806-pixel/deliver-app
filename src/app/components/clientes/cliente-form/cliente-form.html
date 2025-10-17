@@ -200,7 +200,16 @@
                 <!-- Destino -->
                 <div class="mb-3">
                   <label for="destination" class="form-label">Destino *</label>
-                  <ng-select
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="destination"
+                    name="destination"
+                    [(ngModel)]="cliente.destination"
+                    required
+                    [disabled]="loading"
+                  />
+                  <!-- <ng-select //TODO: seleccionar provincias
                     [items]="getProvincias()"
                     bindLabel="name"
                     bindValue="code"
@@ -212,7 +221,7 @@
                     searchable="true"
                     class="form-control bootstrap-select"
                   >
-                  </ng-select>
+                  </ng-select> -->
                 </div>
               </div>
 
